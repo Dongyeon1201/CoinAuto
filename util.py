@@ -170,7 +170,8 @@ class UpbitUtil:
         # 주문 가능한 코인의 수량 구하기
         
         # 주문 가능한 원화가 없을 땐 0 반환
-        if current_krw == 0:
+        # 최소 주문금액(5000원) 보다 적을때는 0 반환
+        if current_krw < 5000:
             return 0
 
         # 매수 시 매수 량 구하기
