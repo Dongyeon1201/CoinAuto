@@ -1,0 +1,9 @@
+version: "3"
+
+services: 
+  coin_auto:
+    image: python:3.8
+    build:
+      context: .
+    container_name: coin_auto
+    command: python3 /usr/src/app/coin_auto.py "비트코인"
