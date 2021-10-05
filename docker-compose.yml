@@ -6,7 +6,6 @@ services:
     build:
       context: .
     container_name: coin_auto_btc
-    command: ls
     command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50
   
   coin_auto_eth:
