@@ -1,9 +1,19 @@
 version: "3"
 
 services: 
-  coin_auto:
+  coin_auto_btc:
     image: python:3.8
     build:
       context: .
-    container_name: coin_auto
+    container_name: coin_auto_btc
+    command: ls
     command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50
+  
+  coin_auto_eth:
+    image: python:3.8
+    build:
+      context: .
+    container_name: coin_auto_eth
+    command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 50
+    depends_on:
+        - coin_auto_btc

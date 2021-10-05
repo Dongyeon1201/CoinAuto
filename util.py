@@ -159,13 +159,12 @@ class UpbitUtil:
         return int(ALL_KRW)
 
     # MarketName을 이용하여 해당 코인의 주문 가능한 현재 가격과 주문량 반환
-    def getCanBuyVolume(self, market_name, current_price):
+    def getCanBuyVolume(self, market_name, current_price, current_krw):
 
         query = {'market': market_name}
         res = requests.get(self.server_url + "/v1/orders/chance", params=query, headers=self.getHeaders(query=query))
 
-        # 사용가능한 원화 조회
-        current_krw = self.getCurrentKRW()
+        # 매수 수수료 조회
         bid_fee = res.json()['bid_fee']
 
         # 주문 가능한 코인의 수량 구하기

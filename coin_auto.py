@@ -17,7 +17,7 @@ def get_arguments():
 
 # 코인이름 인자로 입력
 INPUT_COIN_NAME = get_arguments()['name']
-INPUT_COIN_PROPORTION = get_arguments()['percent']
+INPUT_COIN_PROPORTION = int(get_arguments()['percent'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, up_line_per=3, down_line_per=3)
@@ -32,7 +32,9 @@ if not upbitUtil.isCoinHold(MYCOIN.market_name):
     MYCOIN.setCheckLinePrice(upbitUtil.getCurrentPrice(MYCOIN.market_name))
 
     # 매수 가능한 수량 확인
-    order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price)
+    current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
+
+    order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price, current_krw)
 
     # 주문을 위한 헤더 설정
     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
@@ -133,7 +135,8 @@ while True:
         elif MYCOIN.current_price > MYCOIN.up_line_price:
 
             # 매수 가능한 수량 확인
-            order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price)
+            current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
+            order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price, current_krw)
 
             # 주문을 위한 헤더 설정
             headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
