@@ -1,6 +1,7 @@
 FROM python:3.8
 
 WORKDIR /usr/src/app
+RUN mkdir ./logs
 
 COPY ./requirements.txt ./
 COPY ./coin_auto.py ./

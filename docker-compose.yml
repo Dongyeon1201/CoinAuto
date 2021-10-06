@@ -6,6 +6,8 @@ services:
     build:
       context: .
     container_name: coin_auto_btc
+    volumes:
+      - ./logs:/usr/src/app/logs/
     command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50
   
   coin_auto_eth:
@@ -13,6 +15,8 @@ services:
     build:
       context: .
     container_name: coin_auto_eth
+    volumes:
+      - ./logs:/usr/src/app/logs/
     command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 50
     depends_on:
         - coin_auto_btc
