@@ -9,6 +9,8 @@ services:
     volumes:
       - ./logs:/usr/src/app/logs/
     command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50
+    environment:
+      - "TZ=Asia/Seoul"
   
   coin_auto_eth:
     image: python:3.8
@@ -18,5 +20,7 @@ services:
     volumes:
       - ./logs:/usr/src/app/logs/
     command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 50
+    environment:
+      - "TZ=Asia/Seoul"
     depends_on:
         - coin_auto_btc
