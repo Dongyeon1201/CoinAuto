@@ -93,7 +93,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            print("\t[-] ALL 매도 & {} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-] ALL 매도 & {} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
 
         # 상승 기준에 충족할 때 -> up 모드
         elif MYCOIN.current_price > MYCOIN.check_line_price:
@@ -105,7 +105,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            print("\t[-]{} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-]{} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
 
         # 그 외 -> pass 모드
         else:
@@ -114,7 +114,7 @@ while True:
             MYCOIN.setCoinMode("pass")
 
             # 로그 프린트
-            print("\t[-]현재 가격 : {} [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.current_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-]현재 가격 : {} [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.current_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
 
     # 코인 미 보유 시
     else:
@@ -129,7 +129,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            print("\t[-]{} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-]{} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
 
         # 매수 기준 가격보다 높을 때 -> up 모드 [ 매수 ]
         elif MYCOIN.current_price > MYCOIN.up_line_price:
@@ -154,7 +154,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            print("\t[-]{} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-]{} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
 
         # 그 외 -> pass 모드
         else:
@@ -163,7 +163,7 @@ while True:
             MYCOIN.setCoinMode("pass")
 
             # 로그 프린트
-            print("\t[-] 현재 가격 : {} [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.current_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
+            logging.info("\t[-] 현재 가격 : {} [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.current_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold), flush=True)
     
     # 모든 작업 끝난 후, 이전 가격을 현재 가격으로 설정
     MYCOIN.setBeforePrice(MYCOIN.current_price)
