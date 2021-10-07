@@ -9,18 +9,24 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--name', required=True, help='coin korean name', dest='name')
     parser.add_argument('-p', '--percent', required=False, default=100, help='The proportion(percent) of A coin in total assets', dest='percent')
+    parser.add_argument('-u', '--upline', required=False, default=2, help='Up line percent', dest='upline')
+    parser.add_argument('-d', '--downline', required=False, default=3, help='Down line percent', dest='downline')
    
     return_arg_data['name'] = parser.parse_args().name
     return_arg_data['percent'] = parser.parse_args().percent
+    return_arg_data['upline'] = parser.parse_args().upline
+    return_arg_data['downline'] = parser.parse_args().downline
 
     return return_arg_data
 
 # 코인이름 인자로 입력
 INPUT_COIN_NAME = get_arguments()['name']
 INPUT_COIN_PROPORTION = int(get_arguments()['percent'])
+INPUT_UP_LINE = int(get_arguments()['upline'])
+INPUT_DOWN_LINE = int(get_arguments()['downline'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
-MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, up_line_per=3, down_line_per=3)
+MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, up_line_per=INPUT_UP_LINE, down_line_per=INPUT_DOWN_LINE)
 
 # 현재 해당 코인 보유하고 있지 않을 때 (가장 처음 실행만)
 if not upbitUtil.isCoinHold(MYCOIN.market_name):

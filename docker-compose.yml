@@ -8,7 +8,7 @@ services:
     container_name: coin_auto_btc
     volumes:
       - ./logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50
+    command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 50 -u 2 -d 3
     environment:
       - "TZ=Asia/Seoul"
   
@@ -19,7 +19,7 @@ services:
     container_name: coin_auto_eth
     volumes:
       - ./logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 50
+    command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 50 -u 2 -d 3
     environment:
       - "TZ=Asia/Seoul"
     depends_on:
