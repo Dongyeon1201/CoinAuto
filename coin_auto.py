@@ -22,8 +22,8 @@ def get_arguments():
 # 코인이름 인자로 입력
 INPUT_COIN_NAME = get_arguments()['name']
 INPUT_COIN_PROPORTION = int(get_arguments()['percent'])
-INPUT_UP_LINE = int(get_arguments()['upline'])
-INPUT_DOWN_LINE = int(get_arguments()['downline'])
+INPUT_UP_LINE = float(get_arguments()['upline'])
+INPUT_DOWN_LINE = float(get_arguments()['downline'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, up_line_per=INPUT_UP_LINE, down_line_per=INPUT_DOWN_LINE)
