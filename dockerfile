@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY ./requirements.txt ./
 COPY ./coin_auto.py ./
 COPY ./util.py ./
+COPY ./info.py ./
 
 RUN apt update && apt -y upgrade && apt -y install python3-pip
 RUN pip3 install --upgrade pip

@@ -24,3 +24,16 @@ services:
       - "TZ=Asia/Seoul"
     depends_on:
         - coin_auto_btc
+  
+  coin_info:
+    image: python:3.8
+    build:
+      context: .
+    container_name: coin_info
+    volumes:
+      - ./logs:/usr/src/app/logs/
+    command: python3 /usr/src/app/info.py
+    environment:
+      - "TZ=Asia/Seoul"
+    depends_on:
+        - coin_auto_eth

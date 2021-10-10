@@ -6,6 +6,7 @@ import requests
 import time
 import sys
 import logging
+import schedule
 
 logging.basicConfig(
     filename='/usr/src/app/logs/coin.log',
@@ -25,6 +26,7 @@ SLACK_TOKEN = "xoxb-2451513405360-2547455344711-oI4UayIywovAqCkMX8YK9Kvp"
 SLACK_CHANNEL = "#upbit-알림봇"
 ERROR_MESSAGE = "[+] MESSAGE TYPE : `ERROR`\n"
 INFO_MESSAGE = "[+] MESSAGE TYPE : `INFO`\n"
+KRW_MESSAGE = "[💰] 내 총 자산 알림\n"
 
 # 슬랙으로 메세지 전송
 def SendSlackMessage(msg):
@@ -227,8 +229,8 @@ class UpbitUtil:
 
             if res.status_code == 201:
 
-                logging.info("{} 코인 {} 가격에 ALL 매수 완료".format(market_name, order_price))
-                SendSlackMessage(INFO_MESSAGE + "{} 코인 {} 가격에 ALL 매수 완료".format(market_name, order_price))
+                logging.info("{} 코인 {:,} 가격에 ALL 매수 완료".format(market_name, order_price))
+                SendSlackMessage(INFO_MESSAGE + "{} 코인 *{:,}* 가격에 ALL 매수 완료".format(market_name, order_price))
 
             else:
                 logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
@@ -245,8 +247,8 @@ class UpbitUtil:
             res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
 
             if res.status_code == 201:
-                logging.info("{} 코인 {} 가격에 ALL 매도 완료".format(market_name, order_price))
-                SendSlackMessage(INFO_MESSAGE + "{} 코인 {} 가격에 ALL 매도 완료".format(market_name, order_price))
+                logging.info("{} 코인 {:,} 가격에 ALL 매도 완료".format(market_name, order_price))
+                SendSlackMessage(INFO_MESSAGE + "{} 코인 *{:,}* 가격에 ALL 매도 완료".format(market_name, order_price))
 
             else:
                 logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))

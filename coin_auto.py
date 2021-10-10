@@ -68,6 +68,9 @@ SendSlackMessage(INFO_MESSAGE + "[+] {} 코인({}) 자동 매매 시작".format(
 # 무한 반복 (5초마다 가격 확인 후 동작)
 while True:
 
+    # 하루 1번 현재 나의 총 자산 확인
+    schedule.run_pending()
+
     # 코인의 현재 가격 설정
     MYCOIN.setCurrentPrice(upbitUtil.getCurrentPrice(MYCOIN.market_name))
 
@@ -99,7 +102,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-] ALL 매도 & {} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-] ALL 매도 & {:,} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 상승 기준에 충족할 때 -> up 모드
         elif MYCOIN.current_price > MYCOIN.check_line_price:
@@ -111,7 +114,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-]{} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-]{:,} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 그 외 -> pass 모드
         else:
@@ -135,7 +138,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-]{} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-]{:,} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 매수 기준 가격보다 높을 때 -> up 모드 [ 매수 ]
         elif MYCOIN.current_price > MYCOIN.up_line_price:
@@ -160,7 +163,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-]{} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-]{:,} 가격으로 ALL 매도 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.down_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 그 외 -> pass 모드
         else:
