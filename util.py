@@ -24,9 +24,9 @@ SELL = "ask"
 
 SLACK_TOKEN = "xoxb-2451513405360-2547455344711-oI4UayIywovAqCkMX8YK9Kvp"
 SLACK_CHANNEL = "#upbit-알림봇"
-ERROR_MESSAGE = "[+] MESSAGE TYPE : `ERROR`\n"
-INFO_MESSAGE = "[+] MESSAGE TYPE : `INFO`\n"
-KRW_MESSAGE = "[💰] 내 총 자산 알림\n"
+ERROR_MESSAGE = "*[+] MESSAGE TYPE : `ERROR`*\n"
+INFO_MESSAGE = "*[+] MESSAGE TYPE : `INFO`*\n"
+KRW_MESSAGE = "*[💰] 내 총 자산 알림*\n"
 
 # 슬랙으로 메세지 전송
 def SendSlackMessage(msg):
