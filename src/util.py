@@ -6,7 +6,6 @@ import requests
 import time
 import sys
 import logging
-import schedule
 
 logging.basicConfig(
     filename='/usr/src/app/logs/coin.log',

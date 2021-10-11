@@ -1,0 +1,14 @@
+version: "3"
+
+services:   
+  coin_info:
+    image: python:3.8
+    build:
+      context: ..
+      dockerfile: coin_info/dockerfile
+    container_name: coin_info
+    volumes:
+      - ../logs:/usr/src/app/logs/
+    command: python3 /usr/src/app/info.py
+    environment:
+      - "TZ=Asia/Seoul"

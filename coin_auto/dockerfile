@@ -1,11 +1,7 @@
 FROM python:3.8
 
 WORKDIR /usr/src/app
-
-COPY ./requirements.txt ./
-COPY ./coin_auto.py ./
-COPY ./util.py ./
-COPY ./info.py ./
+COPY ./src ./
 
 RUN apt update && apt -y upgrade && apt -y install python3-pip
 RUN pip3 install --upgrade pip

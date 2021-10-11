@@ -68,9 +68,6 @@ SendSlackMessage(INFO_MESSAGE + "[+] {} 코인({}) 자동 매매 시작".format(
 # 무한 반복 (5초마다 가격 확인 후 동작)
 while True:
 
-    # 하루 1번 현재 나의 총 자산 확인
-    schedule.run_pending()
-
     # 코인의 현재 가격 설정
     MYCOIN.setCurrentPrice(upbitUtil.getCurrentPrice(MYCOIN.market_name))
 
