@@ -28,6 +28,17 @@ INPUT_DOWN_LINE = float(get_arguments()['downline'])
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, up_line_per=INPUT_UP_LINE, down_line_per=INPUT_DOWN_LINE)
 
+## 현재 나의 거래 코인의 평균 거래량(5분) 확인
+# 초기 설정
+MYCOIN.setTradeVolAvg(upbitUtil.getTradeVolAvg(4, MYCOIN.market_name))
+# 평균 거래량 설정 함수
+def setTradeAvg():
+    MYCOIN.setTradeVolAvg(upbitUtil.getTradeVolAvg(4, MYCOIN.market_name))
+
+## 스케줄 모음
+# 매 분이 되자마자 평균 거래량 재 설정
+schedule.every().minute.at(":00").do(setTradeAvg)
+
 # 현재 해당 코인 보유하고 있지 않을 때 (가장 처음 실행만)
 if not upbitUtil.isCoinHold(MYCOIN.market_name):
 
@@ -37,19 +48,22 @@ if not upbitUtil.isCoinHold(MYCOIN.market_name):
     MYCOIN.setBeforePrice(upbitUtil.getCurrentPrice(MYCOIN.market_name))
     MYCOIN.setCheckLinePrice(upbitUtil.getCurrentPrice(MYCOIN.market_name))
 
-    # 매수 가능한 수량 확인
-    current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
+    # 코인 보유 여부 False로 변경
+    MYCOIN.setisCoinHold(False)
 
-    order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price, current_krw)
+    # # 매수 가능한 수량 확인
+    # current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
 
-    # 주문을 위한 헤더 설정
-    headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
+    # order_volume = upbitUtil.getCanBuyVolume(MYCOIN.market_name, MYCOIN.current_price, current_krw)
 
-    # 코인 구입
-    upbitUtil.orderCoin(MYCOIN.market_name, BUY, order_volume, MYCOIN.current_price, headers)
+    # # 주문을 위한 헤더 설정
+    # headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
-    # 코인 보유 여부 True로 변경
-    MYCOIN.setisCoinHold(True)
+    # # 코인 구입
+    # upbitUtil.orderCoin(MYCOIN.market_name, BUY, order_volume, MYCOIN.current_price, headers)
+
+    # # 코인 보유 여부 True로 변경
+    # MYCOIN.setisCoinHold(True)
 
 # 현재 해당 코인을 보유하고 있을 때 (가장 처음 실행만)
 else:
@@ -73,6 +87,9 @@ while True:
 
     # 코인의 보유 여부 확인
     MYCOIN.setisCoinHold(upbitUtil.isCoinHold(MYCOIN.market_name))
+
+    # 현재 거래량 확인
+    MYCOIN.setTradeRecent(upbitUtil.getTradeRecent(MYCOIN.market_name))
 
     # 코인 보유 시
     if MYCOIN.is_coin_hold:
@@ -99,7 +116,7 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-] ALL 매도 & {:,} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-] ALL 매도 & {:,} 가격으로 ALL 매수 기준 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 상승 기준에 충족할 때 -> up 모드
         elif MYCOIN.current_price > MYCOIN.check_line_price:
@@ -135,10 +152,10 @@ while True:
             MYCOIN.setCheckLinePrice(MYCOIN.current_price)
 
             # 로그 프린트
-            logging.info("\t[-]{:,} 가격으로 ALL 매수 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
+            logging.info("\t[-]{:,} 가격으로 ALL 매수 기준 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 매수 기준 가격보다 높을 때 -> up 모드 [ 매수 ]
-        elif MYCOIN.current_price > MYCOIN.up_line_price:
+        elif MYCOIN.current_price > MYCOIN.up_line_price and upbitUtil.getTradeChange(MYCOIN.market_name) == 'RISE' and MYCOIN.trade_recent['candle_acc_trade_volume'] > MYCOIN.trade_vol_avg * 2:
 
             # 매수 가능한 수량 확인
             current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
@@ -171,6 +188,12 @@ while True:
             # 로그 프린트
             logging.info("\t[-] 현재 가격 : {} [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.current_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
     
+    ## 1회 작업이 끝난 후
     # 모든 작업 끝난 후, 이전 가격을 현재 가격으로 설정
     MYCOIN.setBeforePrice(MYCOIN.current_price)
+
+    # 스케줄 확인
+    schedule.run_pending()
+
+    # 5초 딜레이
     time.sleep(5)

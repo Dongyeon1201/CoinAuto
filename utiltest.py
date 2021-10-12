@@ -5,16 +5,7 @@ from urllib.parse import urlencode
 import requests
 import time
 import sys
-import logging
-import schedule
 import json
-
-logging.basicConfig(
-    filename='/usr/src/app/logs/coin.log',
-    level=logging.INFO,
-    format = '%(asctime)s:%(levelname)s:%(message)s',
-    datefmt = '%Y-%m-%d %H:%M:%S %p',
-)
 
 API_SERVER_URL = "https://api.upbit.com"
 API_ACCESS_KEY = "gdD6NqXZ4jI6AR5bDMn3b0w5yoTdex6vTdY8zyzi"
@@ -91,7 +82,6 @@ class UpbitUtil:
             headers = {"Authorization": authorize_token}
 
         except Exception as e:
-            logging.error("[ Function Name : getHeaders() ]\n[+] 헤더 생성에 실패하였습니다.\n[-] ERROR : {}".format(e))
             SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getHeaders() ]\n[+] 헤더 생성에 실패하였습니다.".format(e))
 
         return headers
@@ -111,7 +101,6 @@ class UpbitUtil:
             return False
         
         else:
-            logging.error("[ Function Name : isCoinHold() ]\n[+] 현재 {} 의 소유 여부를 확인할 수 없습니다. STATUS CODE : {}".format(market_name, res.status_code))
             SendSlackMessage(ERROR_MESSAGE + "[ Function Name : isCoinHold() ]\n[+] 현재 {} 의 소유 여부를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
     # MarketName을 사용하여 해당 코인의 가격 반환
@@ -124,7 +113,6 @@ class UpbitUtil:
             return current_price
         
         else:
-            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))
             SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
     # MarketName을 이용하여 해당 코인의 미 체결 주문 목록을 반환
@@ -140,8 +128,7 @@ class UpbitUtil:
             return res.json()
 
         else:
-            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}".format(res.status_code))
-            SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, res.text))
     
     # 사용가능한 원화 반환
     def getCurrentKRW(self, percent=100):
@@ -203,8 +190,7 @@ class UpbitUtil:
             if 'KRW-' + item['currency'] == market_name:
                 return float(item['balance'])
         
-        logging.error("[ Function Name : getCanSellVolume() ]\n[+] {} 코인의 정보를 확인할 수 없습니다.".format(market_name))
-        SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCanSellVolume() ]\n[+] {} 코인의 정보를 확인할 수 없습니다.\n[ ERROR ] ```{}```".format(market_name, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+        SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCanSellVolume() ]\n[+] {} 코인의 정보를 확인할 수 없습니다.\n[ ERROR ] ```{}```".format(market_name, res.text))
 
     # 코인 주문
     # order_side : bid -> 매수
@@ -230,12 +216,10 @@ class UpbitUtil:
 
             if res.status_code == 201:
 
-                logging.info("{} 코인 {:,} 가격에 ALL 매수 완료".format(market_name, order_price))
                 SendSlackMessage(INFO_MESSAGE + "{} 코인 *{:,}* 가격에 ALL 매수 완료".format(market_name, order_price))
 
             else:
-                logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, res.text))
 
         # 매도
         elif order_side == "ask":
@@ -248,12 +232,10 @@ class UpbitUtil:
             res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
 
             if res.status_code == 201:
-                logging.info("{} 코인 {:,} 가격에 ALL 매도 완료".format(market_name, order_price))
                 SendSlackMessage(INFO_MESSAGE + "{} 코인 *{:,}* 가격에 ALL 매도 완료".format(market_name, order_price))
 
             else:
-                logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, res.text))
 
     # 현재 거래량 확인
     def getTradeRecent(self, market_name):
@@ -346,12 +328,10 @@ class Coin:
                     if monetary + "-" in item['market']:
                         return item['market']
             
-            logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
-            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
 
         else:
-            logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
-            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
 
     # 코인의 현재 가격 설정
     def setCurrentPrice(self, current_price):
@@ -381,7 +361,7 @@ class Coin:
     # 코인의 모드 설정
     def setCoinMode(self, coin_mode):
         self.coin_mode = coin_mode
-    
+
     def setTradeRecent(self, trade_recent):
         self.trade_recent = trade_recent
 
