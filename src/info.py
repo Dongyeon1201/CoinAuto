@@ -31,7 +31,7 @@ def InfoGetAllKRW():
 
     SendSlackMessage(KRW_MESSAGE + "[ TODAY ] {}\n[ 자산 ] {:,}₩\n[ AMOUNT ] {} {:,}₩ *[ {}{:.2f}% ]*".format(now_time, NOW_ALL_KRW, UP_DOWN_CHAR, amount, UP_DOWN_CHAR2, percent))
 
-    BEFORE_ALL_KRW = NOW_ALL_KRW - 10000
+    BEFORE_ALL_KRW = NOW_ALL_KRW
 
 # 최초 1회 나의 자산 확인
 InfoGetAllKRW()
