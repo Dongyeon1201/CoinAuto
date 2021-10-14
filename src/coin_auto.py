@@ -155,7 +155,7 @@ while True:
             logging.info("\t[-]{:,} 가격으로 ALL 매수 기준 설정 [ 코인 이름 : {} / Mode : {} / isHold : {} ]".format(MYCOIN.up_line_price, MYCOIN.market_name, MYCOIN.coin_mode, MYCOIN.is_coin_hold))
 
         # 매수 기준 가격보다 높을 때 -> up 모드 [ 매수 ]
-        elif MYCOIN.current_price > MYCOIN.up_line_price and upbitUtil.getTradeChange(MYCOIN.market_name) == 'RISE' and MYCOIN.trade_recent['candle_acc_trade_volume'] > MYCOIN.trade_vol_avg * 2:
+        elif MYCOIN.current_price > MYCOIN.up_line_price and upbitUtil.getTradeChange(MYCOIN.market_name) == 'RISE' and MYCOIN.trade_recent['candle_acc_trade_volume'] > MYCOIN.trade_vol_avg:
 
             # 매수 가능한 수량 확인
             current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
