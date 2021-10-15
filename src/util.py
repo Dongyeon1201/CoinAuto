@@ -262,7 +262,7 @@ class UpbitUtil:
             "market": market_name,
             "count": 1
         }
-        res = requests.get(self.server_url + "/v1/candles/minutes/10", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/minutes/5", headers=self.getHeaders(), params=param)
 
         # 현재 포함한 이전 5분동안 거래 내역 확인
         trade_data = json.loads(res.text)
@@ -277,7 +277,7 @@ class UpbitUtil:
             "market": market_name,
             "count": count+1
         }
-        res = requests.get(self.server_url + "/v1/candles/minutes/10", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/minutes/5", headers=self.getHeaders(), params=param)
 
         # 현재 포함한 이전 5분동안 거래 내역 확인
         trade_data = json.loads(res.text)
