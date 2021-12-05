@@ -90,7 +90,7 @@ class UpbitUtil:
         res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
         
         if res.status_code == 200:
-            return res.json()['opening_price']
+            return res.json().pop()['opening_price']
 
         else:
             logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))

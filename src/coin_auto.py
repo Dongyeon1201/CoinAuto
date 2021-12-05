@@ -78,9 +78,6 @@ while True:
     # 코인의 보유 여부 확인
     MYCOIN.setisCoinHold(upbitUtil.isCoinHold(MYCOIN.market_name))
 
-    # 현재 거래량 확인
-    MYCOIN.setTradeRecent(upbitUtil.getTradeRecent(MYCOIN.market_name))
-
     # 현재 상승세인지 확인
     MYCOIN.setIsRise(upbitUtil.isRise(MYCOIN.market_name))
 
@@ -137,7 +134,7 @@ while True:
                 # 코인 보유 여부 True로 변경
                 MYCOIN.setisCoinHold(True)
 
-                logging.info("\t[-] ALL 매도 & {:,} 가격으로 ALL 매수 기준 설정 [ 코인 이름 : {} / isHold : {} ]".format(MYCOIN.return_line_price, MYCOIN.market_name, MYCOIN.is_coin_hold))
+                logging.info("\t[-] {:,} 가격으로 ALL 매수 [ 코인 이름 : {} / isHold : {} ]".format(MYCOIN.return_line_price, MYCOIN.market_name, MYCOIN.is_coin_hold))
     
     ########## 1회 작업이 끝난 후 ##########
     # 모든 작업 끝난 후, 이전 가격을 현재 가격으로 설정
