@@ -1,4 +1,4 @@
-from base import *
+from util.base import *
 
 # 슬랙으로 메세지 전송
 def SendSlackMessage(msg):
