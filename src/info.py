@@ -1,4 +1,6 @@
 from util import *
+from util.upbit import *
+from util.info import *
 import schedule
 import time
 

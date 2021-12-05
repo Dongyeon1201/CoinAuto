@@ -1,54 +1,6 @@
-import jwt
-import uuid
-import hashlib
-from urllib.parse import urlencode
-import requests
-import time
-import sys
-import logging
-import schedule
-import json
+from base import *
+from util.info import SendSlackMessage
 
-logging.basicConfig(
-    filename='/usr/src/app/logs/coin.log',
-    level=logging.INFO,
-    format = '%(asctime)s:%(levelname)s:%(message)s',
-    datefmt = '%Y-%m-%d %H:%M:%S %p',
-)
-
-API_SERVER_URL = "https://api.upbit.com"
-API_ACCESS_KEY = "gdD6NqXZ4jI6AR5bDMn3b0w5yoTdex6vTdY8zyzi"
-API_SECRET_KEY = "1DI4qxHDm1sjdC7G6D4zRI32GGTvvs0LCnvUseUd"
-
-BUY = "bid"
-SELL = "ask"
-
-SLACK_TOKEN = "xoxb-2451513405360-2547455344711-oI4UayIywovAqCkMX8YK9Kvp"
-SLACK_CHANNEL = "#upbit-알림봇"
-ERROR_MESSAGE = "*[+] MESSAGE TYPE : `ERROR`*\n"
-INFO_MESSAGE = "*[+] MESSAGE TYPE : `INFO`*\n"
-KRW_MESSAGE = "*[💰] 내 총 자산 알림*\n"
-
-# 슬랙으로 메세지 전송
-def SendSlackMessage(msg):
-    requests.post(
-        "https://slack.com/api/chat.postMessage",
-        headers={"Authorization": "Bearer " + SLACK_TOKEN},
-        data={"channel": SLACK_CHANNEL,"text": msg}
-    )
-
-# 소수점 자르기 함수
-def truncate(num,n):
-    temp = str(num)
-    for x in range(len(temp)):
-        if temp[x] == '.':
-            try:
-                return float(temp[:x+n+1])
-            except:
-                return float(temp)      
-    return float(temp)
-
-# 코인의 이름으로 해당 코인의 정보 조회 / 주문 등 기능 모음
 class UpbitUtil:
     
     # API KEY 설정
@@ -127,6 +79,23 @@ class UpbitUtil:
             logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))
             SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
+        # MarketName을 사용하여 해당 코인의 가격 반환
+    def getTodayOpeningprice(self, market_name):
+
+        param = {
+            "count": 1,
+            "market" : market_name
+        }
+
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        
+        if res.status_code == 200:
+            return res.json()['opening_price']
+
+        else:
+            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))
+            SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+
     # MarketName을 이용하여 해당 코인의 미 체결 주문 목록을 반환
     def getWaitOrderList(self, market_name):
         query = {
@@ -142,7 +111,22 @@ class UpbitUtil:
         else:
             logging.error("[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}".format(res.status_code))
             SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
-    
+
+    # MarketName을 이용하여 해당 코인의 평균 매수가 확인
+    def getBuyprice(self, market_Name):
+        
+        res = requests.get(self.server_url + "/v1/accounts", headers=self.getHeaders())
+        
+        # 평균 매수가 확인
+        for item in res.json():
+            if item['currency'] == market_Name:
+                return item['avg_buy_price']
+        
+        logging.error("[ Function Name : getBuyprice() ]\n[+] {} 코인의 평균매수가를 받아올 수 없습니다. STATUS CODE : {}".format(market_Name, res.status_code))
+        SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getBuyprice() ]\n[+] {} 코인의 평균매수가를 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_Name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+
+        return False
+
     # 사용가능한 원화 반환
     def getCurrentKRW(self, percent=100):
 
@@ -191,8 +175,8 @@ class UpbitUtil:
 
         # 매수 시 매수 량 구하기
         # (주문하려는 금액 * (1-bid_fee) / 현재 가격) -> 8자리에서 버림
-        order_volume = truncate(current_krw * (1-float(bid_fee)) / current_price, 8)
-        return order_volume
+        orderable_volume = truncate(current_krw * (1-float(bid_fee)) / current_price, 8)
+        return orderable_volume
 
     # 매도 가능한 코인의 수량 확인
     def getCanSellVolume(self, market_name):
@@ -209,11 +193,11 @@ class UpbitUtil:
     # 코인 주문
     # order_side : bid -> 매수
     # order_side : ask -> 매도
-    def orderCoin(self, market_name, order_side, order_volume, order_price, headers):
+    def orderCoin(self, market_name, order_side, orderable_volume, order_price, headers):
 
         query = {
             'market': market_name,
-            'volume': order_volume,
+            'volume': orderable_volume,
             'price': order_price,
             'ord_type': 'limit'
         }
@@ -255,7 +239,7 @@ class UpbitUtil:
                 logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
-    # 현재 거래량 확인
+    # 현재 거래량 확인 (5분 기준)
     def getTradeRecent(self, market_name):
 
         param = {
@@ -270,7 +254,7 @@ class UpbitUtil:
         # 현재 거래 내역은 따로 저장
         return trade_data[0]
 
-    # 평균 거래량 확인
+    # 평균 거래량 확인 (5분 거래량)
     def getTradeVolAvg(self, count, market_name):
 
         param = {
@@ -305,85 +289,41 @@ class UpbitUtil:
         # 현재 상태 확인
         return res.json()[0]['change']
 
-# 각 코인에 대한 정보를 담은 클래스
-class Coin:
+    # MA 구하기
+    def getMA(self, market_name, count, type='days', unit=1):
 
-    def __init__(self, korean_name, coin_proportion, up_line_per, down_line_per):
+        MA = 0
 
-        self.server_url = API_SERVER_URL    # 서버 주소
+        param = {
+            "count": count,
+            "market" : market_name
+        }
 
-        self.up_line_per = 0.01 * (100 + up_line_per)      # 코인의 상승 라인
-        self.down_line_per = 0.01 * (100 - down_line_per)  # 코인의 하락 라인
-
-        # 코인의 한글 이름
-        self.coin_korean_name = korean_name
-
-        # 코인의 전체 자산 최대 비율
-        self.coin_proportion = coin_proportion
-
-        # upbit API 동작에 사용될 market_name
-        self.market_name = self.getMarketName(self.coin_korean_name)
-
-        # 코인 보유 여부는 초기에 False로 설정
-        self.is_coin_hold = False
-
-        # 코인 확인 모드 설정
-        # up : 기준에 따라 오르는 중
-        # down : 기준에 따라 떨어지는 중
-        # pass : 가만히 지켜보는 중 [기본 값]
-        self.coin_mode = 'pass'
-
-    # 코인 이름(한글)을 입력받아 MarketName 반환
-    def getMarketName(self, korean_name, monetary="KRW"):
-
-        monetary = monetary.upper()
-
-        res = requests.get(self.server_url + "/v1/market/all")
-
-        if res.status_code == 200:
-            for item in res.json():
-                if item['korean_name'] == korean_name:
-                    if monetary + "-" in item['market']:
-                        return item['market']
-            
-            logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
-            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
-
+        # 분단위 캔들을 조회할 때
+        if type == "minutes":
+            res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(unit), headers=self.getHeaders(), params=param)
         else:
-            logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
-            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            res = requests.get(self.server_url + "/v1/candles/{}".format(type), headers=self.getHeaders(), params=param)
 
-    # 코인의 현재 가격 설정
-    def setCurrentPrice(self, current_price):
-        self.current_price = current_price
+        for item in res.json():
+            MA += item['trade_price']
+
+        return MA / count
     
-    # 코인의 이전 가격 설정
-    def setBeforePrice(self, before_price):
-        self.before_price = before_price
+    # 일봉(당일 포함) 3일 연속 양봉인지 확인
+    def isRise(self, market_name):
 
-    # 코인의 체크라인 가격 설정
-    # 체크라인 가격에 따라 상승 기준가, 하락 기준가 결정
-    def setCheckLinePrice(self, check_line_price):
+        param = {
+            "count": 3,
+            "market" : market_name
+        }
 
-        # 체크라인 가격 설정
-        self.check_line_price = check_line_price
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
 
-        # 상승 기준가
-        self.up_line_price = check_line_price * self.up_line_per
+        for item in res.json():
 
-        # 하락 기준가
-        self.down_line_price = check_line_price * self.down_line_per
+            # 3일(당일 포함) 중 하루라도 양봉이 아닐 경우 바로 False 반환
+            if item['trade_price'] < item['opening_price']:
+                return False
 
-    # 코인의 보유 여부 확인
-    def setisCoinHold(self, is_coin_hold):
-        self.is_coin_hold = is_coin_hold
-
-    # 코인의 모드 설정
-    def setCoinMode(self, coin_mode):
-        self.coin_mode = coin_mode
-    
-    def setTradeRecent(self, trade_recent):
-        self.trade_recent = trade_recent
-
-    def setTradeVolAvg(self, trade_vol_avg):
-        self.trade_vol_avg = trade_vol_avg
+        return True
