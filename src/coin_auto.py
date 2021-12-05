@@ -36,7 +36,7 @@ MYCOIN = Coin(INPUT_COIN_NAME, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COI
 MYCOIN.setCurrentPrice(upbitUtil.getCurrentPrice(MYCOIN.market_name)) # 현재 가격 설정
 MYCOIN.setBeforePrice(upbitUtil.getCurrentPrice(MYCOIN.market_name)) # 이전 가격은 초기값으로 현재 가격과 동일하게 설정
 MYCOIN.setMA_5(upbitUtil.getMA(MYCOIN.market_name, 5)) # 5일 MA 설정
-MYCOIN.setMA_30(upbitUtil.getTradeVolAvg(MYCOIN.market_name, 30)) # 30일 MA 설정
+MYCOIN.setMA_30(upbitUtil.getMA(MYCOIN.market_name, 30)) # 30일 MA 설정
 # MYCOIN.setTradeVolAvg(upbitUtil.getTradeVolAvg(4, MYCOIN.market_name)) # 거래량 설정
 
 # 코인을 기존에 보유하고 있을 때 (가장 처음 실행만)
@@ -58,11 +58,11 @@ if upbitUtil.isCoinHold(MYCOIN.market_name):
 # 30일, 5일 MA 재설정 함수(스케줄에 사용)
 def dailyExec():
     MYCOIN.setMA_5(upbitUtil.getMA(MYCOIN.market_name, 5))
-    MYCOIN.setMA_30(upbitUtil.getTradeVolAvg(MYCOIN.market_name, 30))
+    MYCOIN.setMA_30(upbitUtil.getMA(MYCOIN.market_name, 30))
     MYCOIN.setTodayOpeningprice(upbitUtil.getTodayOpeningprice(MYCOIN.market_name))
 
 # 매일 0시에 각 MA 재 설정(15초 딜레이)
-schedule.every().minute.at("00:00:15").do(dailyExec)
+schedule.every().day.at("00:00:15").do(dailyExec)
 
 ##################################################
     

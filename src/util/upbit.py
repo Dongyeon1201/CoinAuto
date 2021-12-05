@@ -259,7 +259,7 @@ class UpbitUtil:
 
         param = {
             "market": market_name,
-            "count": count+1
+            "count": count
         }
         res = requests.get(self.server_url + "/v1/candles/minutes/5", headers=self.getHeaders(), params=param)
 
