@@ -109,9 +109,9 @@ while True:
     else:
 
         # 현재 가격이 30일선 넘을 때 [ 매수 ]
+        # 시가가 30일선 밑 일때
         if  MYCOIN.current_price > MYCOIN.MA_30 and \
-            MYCOIN.opening_price < MYCOIN.MA_30 and \
-            MYCOIN.isRise:
+            MYCOIN.opening_price < MYCOIN.MA_30:
 
             # 매수 가능한 수량 확인
             current_krw = upbitUtil.getCurrentKRW(MYCOIN.coin_proportion)
