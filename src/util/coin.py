@@ -40,7 +40,12 @@ class Coin:
                         return item['market']
             
             logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
-            SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+
+            if res.text == None:
+                SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```NONE```".format(korean_name, res.status_code))
+            else:
+                SendSlackMessage("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(korean_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            
 
         else:
             logging.error("[ Function Name : getMarketName() ]\n[+] {} 의 검색 결과를 확인할 수 없습니다. STATUS CODE : {}".format(korean_name, res.status_code))
