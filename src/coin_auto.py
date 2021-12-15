@@ -78,9 +78,6 @@ while True:
     # 코인의 보유 여부 확인
     MYCOIN.setisCoinHold(upbitUtil.isCoinHold(MYCOIN.market_name))
 
-    # 현재 상승세인지 확인
-    MYCOIN.setIsRise(upbitUtil.isRise(MYCOIN.market_name))
-
     # 코인 보유 시
     if MYCOIN.is_coin_hold:
 
