@@ -8,6 +8,8 @@ import sys
 import logging
 import schedule
 import json
+import asyncio
+import websockets   # 웹 소켓 모듈을 선언한다.
 
 # 소수점 자르기 함수
 def truncate(num,n):
@@ -20,14 +22,15 @@ def truncate(num,n):
                 return float(temp)      
     return float(temp)
 
-logging.basicConfig(
-    filename='/usr/src/app/logs/coin.log',
-    level=logging.INFO,
-    format = '%(asctime)s:%(levelname)s:%(message)s',
-    datefmt = '%Y-%m-%d %H:%M:%S %p',
-)
+# logging.basicConfig(
+#     filename='/usr/src/app/logs/coin.log',
+#     level=logging.INFO,
+#     format = '%(asctime)s:%(levelname)s:%(message)s',
+#     datefmt = '%Y-%m-%d %H:%M:%S %p',
+# )
 
 API_SERVER_URL = "https://api.upbit.com"
+WEBSOCKET_URL = "wss://api.upbit.com/websocket/v1"
 API_ACCESS_KEY = "gdD6NqXZ4jI6AR5bDMn3b0w5yoTdex6vTdY8zyzi"
 API_SECRET_KEY = "1DI4qxHDm1sjdC7G6D4zRI32GGTvvs0LCnvUseUd"
 

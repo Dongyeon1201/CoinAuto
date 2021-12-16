@@ -3,13 +3,10 @@ from util.info import SendSlackMessage
 
 class Coin:
 
-    def __init__(self, korean_name, coin_proportion, want_return, down_line):
+    def __init__(self, market_name, coin_proportion, want_return, down_line):
 
         # 서버 주소
         self.server_url = API_SERVER_URL    
-
-        # 코인의 한글 이름
-        self.coin_korean_name = korean_name
 
         # 코인의 전체 자산 최대 비율
         self.coin_proportion = coin_proportion
@@ -20,8 +17,8 @@ class Coin:
         # 코인이 5일선에서 몇% 떨어졌을 때 매도할지 수치
         self.down_line = down_line
 
-        # upbit API 동작에 사용될 market_name
-        self.market_name = self.getMarketName(self.coin_korean_name)
+        # 코인 이름
+        self.market_name = market_name
 
         # 코인 보유 여부는 초기에 False로 설정
         self.is_coin_hold = False

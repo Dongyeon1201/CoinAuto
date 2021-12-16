@@ -1,56 +1,14 @@
 version: "3"
 
 services: 
-  coin_auto_btc:
+  coin_auto_engine:
     image: python:3.8
     build:
       context: ..
       dockerfile: coin_auto/dockerfile
-    container_name: coin_auto_btc
+    container_name: coin_auto_engine
     volumes:
       - ../logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "비트코인" -p 70
+    command: python3 /usr/src/app/coin_auto.py -p 70
     environment:
       - "TZ=Asia/Seoul"
-  
-  coin_auto_eth:
-    image: python:3.8
-    build:
-      context: ..
-      dockerfile: coin_auto/dockerfile
-    container_name: coin_auto_eth
-    volumes:
-      - ../logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "이더리움" -p 70
-    environment:
-      - "TZ=Asia/Seoul"
-    depends_on:
-        - coin_auto_btc
-
-  coin_auto_etc:
-    image: python:3.8
-    build:
-      context: ..
-      dockerfile: coin_auto/dockerfile
-    container_name: coin_auto_etc
-    volumes:
-      - ../logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "이더리움클래식" -p 70
-    environment:
-      - "TZ=Asia/Seoul"
-    depends_on:
-        - coin_auto_eth
-  
-  coin_auto_enj:
-    image: python:3.8
-    build:
-      context: ..
-      dockerfile: coin_auto/dockerfile
-    container_name: coin_auto_enj
-    volumes:
-      - ../logs:/usr/src/app/logs/
-    command: python3 /usr/src/app/coin_auto.py -n "엔진코인" -p 70
-    environment:
-      - "TZ=Asia/Seoul"
-    depends_on:
-        - coin_auto_etc

@@ -9,6 +9,8 @@ class UpbitUtil:
         self.access_key = API_ACCESS_KEY
         self.secret_key = API_SECRET_KEY
 
+        self.coins_info = {}
+
     # API 요청을 위한 header 반환
     # 결제시에는 market name을 포함한 쿼리를 이용한 query_hash / query_hash_alg 추가 페이로드 필요
     def getHeaders(self, query=None):
@@ -70,6 +72,11 @@ class UpbitUtil:
             else:
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : isCoinHold() ]\n[+] 현재 {} 의 소유 여부를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
+    def getAllCoinList(self):
+        headers = {"Accept": "application/json"}
+        res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=false", headers=headers)
+        return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market']]
+
     # MarketName을 사용하여 해당 코인의 가격 반환
     def getCurrentPrice(self, market_name):
 
@@ -87,7 +94,7 @@ class UpbitUtil:
             else:
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
-        # MarketName을 사용하여 해당 코인의 가격 반환
+    # MarketName을 사용하여 해당 코인의 가격 반환
     def getTodayOpeningprice(self, market_name):
 
         param = {
@@ -321,8 +328,20 @@ class UpbitUtil:
         # 현재 상태 확인
         return res.json()[0]['change']
 
+    # 코인의 초기 상태 설정
+    def setCoinInfo(self):
+
+        for CoinName in self.getAllCoinList():
+
+            self.coins_info[CoinName] = {
+                "trade_price" : None,
+                "opening_price" : None,
+                "MA30" : None,
+                "MA5" : None
+            }
+
     # MA 구하기
-    def getMA(self, market_name, count, type='days', unit=1):
+    def setMA(self, market_name, count):
 
         MA = 0
 
@@ -331,16 +350,15 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # 분단위 캔들을 조회할 때
-        if type == "minutes":
-            res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(unit), headers=self.getHeaders(), params=param)
-        else:
-            res = requests.get(self.server_url + "/v1/candles/{}".format(type), headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
 
         for item in res.json():
             MA += item['trade_price']
 
-        return MA / count
+        if count == 30:
+            self.coins_info[market_name]['MA30'] = MA / 30
+        elif count == 5:
+            self.coins_info[market_name]['MA5'] = MA / 5
     
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):
@@ -359,3 +377,24 @@ class UpbitUtil:
                 return False
 
         return True
+    
+    async def websocket_connect(self, market_items):
+
+        # 웹 소켓에 접속을 합니다.
+        async with websockets.connect(WEBSOCKET_URL) as websocket:        
+
+            for market_name in market_items:
+
+                send_data = str([{"ticket":"GetPrice"},{"type":"ticker","codes":[market_name]}])
+                await websocket.send(send_data)
+            
+                # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
+                try:
+                    data = await websocket.recv()
+                    data = json.loads(data.decode('utf-8'))
+
+                    self.coins_info[data['code']]["trade_price"] = data['trade_price']
+                    self.coins_info[data['code']]["opening_price"] = data['opening_price']
+
+                except websockets.ConnectionClosed:
+                    break
