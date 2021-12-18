@@ -60,94 +60,88 @@ schedule.every().day.at("00:00:15").do(dailyExec)
 
 ##################################################
 
-# dailyExec()
+# 최초 시작 시 MA 설정 함수 동작
+dailyExec()
 
 # 시작 메세지 전송
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
 
+##################### 무한 반복 (5초마다 가격 확인 후 동작) ####################
+
 while True:
+
     # 코인의 현재 가격과 시가 설정
     asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
-    print(upbitUtil.coins_info['KRW-BTC']['trade_price'])
+    # 현재 소유중인 코인 이름 목록
+    hold_coin = CoinAccount.GetHoldCoinList()
 
-    sleep(5)
+    for CoinName in CoinAccount.watch_coin_list:
 
-##################### 무한 반복 (5초마다 가격 확인 후 동작) ####################
-
-# while True:
-
-#     # 코인의 현재 가격과 시가 설정
-#     asyncio.get_event_loop().run_until_complete(UpbitUtil.websocket_connect())
-
-#     # 현재 소유중인 코인 이름 목록
-#     hold_coin = CoinAccount.GetHoldCoinList()
-
-#     for CoinName in CoinAccount.watch_coin_list:
-
-#         # 코인 보유 시(매도 조건 확인)
-#         if CoinName in hold_coin:
+        # 코인 보유 시(매도 조건 확인)
+        if CoinName in hold_coin:
             
-#             MYCOIN = CoinAccount.GetCoin(CoinName)
+            MYCOIN = CoinAccount.GetCoin(CoinName)
 
-#             # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
-#             if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price and \
-#                 upbitUtil.coins_info[CoinName]['trade_price'] < upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)):
+            # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
+            if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price and \
+                upbitUtil.coins_info[CoinName]['trade_price'] < upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)):
                 
-#                 # 매도 가능한 수량 확인
-#                 orderable_volume = upbitUtil.getCanSellVolume(MYCOIN.market_name)
+                # 매도 가능한 수량 확인
+                orderable_volume = upbitUtil.getCanSellVolume(MYCOIN.market_name)
                 
-#                 # 매도 가능할 때
-#                 if orderable_volume > 0:
+                # 매도 가능할 때
+                if orderable_volume > 0:
                     
-#                     # 주문을 위한 헤더 설정
-#                     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
+                    # 주문을 위한 헤더 설정
+                    headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
-#                     # 코인 판매
-#                     upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, MYCOIN.current_price, headers)
+                    # 코인 판매
+                    upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, MYCOIN.current_price, headers)
                     
-#                     CoinAccount.DelCoin(MYCOIN)
+                    CoinAccount.DelCoin(MYCOIN)
 
-#         # 코인 미 보유 시(매수 조건 확인)
-#         else:
+        # 코인 미 보유 시(매수 조건 확인)
+        else:
 
-#             # 현재 가격이 30일선 넘을 때 [ 매수 ]
-#             # 시가가 30일선 밑 일때
-#             if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
-#                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
+            # 현재 가격이 30일선 넘을 때 [ 매수 ]
+            # 시가가 30일선 밑 일때
+            if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
+                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
 
-#                 # 매수 가능한 수량 확인
-#                 current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
-#                 orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
+                # 매수 가능한 수량 확인
+                current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+                orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
-#                 # 매수 가능한 수량이 있을 때
-#                 if orderable_volume > 0:
-#                     # 주문을 위한 헤더 설정
-#                     headers = upbitUtil.getHeaders(query={'market': CoinName})
+                # 매수 가능한 수량이 있을 때
+                if orderable_volume > 0:
 
-#                     # 코인 구입
-#                     upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
+                    # 주문을 위한 헤더 설정
+                    headers = upbitUtil.getHeaders(query={'market': CoinName})
 
-#                     # 코인 추가
-#                     MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
-#                     CoinAccount.AddCoin(MYCOIN)
+                    # 코인 구입
+                    upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
 
-#                     # 평균 매수가 재 설정
-#                     MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
+                    # 코인 추가
+                    MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
+                    CoinAccount.AddCoin(MYCOIN)
 
-#                     # 수익 실현 매수가 재 설정
-#                     MYCOIN.setReturnLinePrice()
+                    # 평균 매수가 재 설정
+                    MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
-#                     logging.info("\t[-] {:,} 가격으로 ALL 매수 [ 코인 이름 : {} / isHold : {} ]".format(MYCOIN.return_line_price, MYCOIN.market_name, MYCOIN.is_coin_hold))
+                    # 수익 실현 매수가 재 설정
+                    MYCOIN.setReturnLinePrice()
+
+                    logging.info("\t[-] {:,} 가격으로 ALL 매수 [ 코인 이름 : {} / isHold : {} ]".format(MYCOIN.return_line_price, MYCOIN.market_name, MYCOIN.is_coin_hold))
         
-#     ########## 1회 작업이 끝난 후 ##########
+    ########## 1회 작업이 끝난 후 ##########
 
-#     # 스케줄 확인
-#     schedule.run_pending()
+    # 스케줄 확인
+    schedule.run_pending()
 
-#     ########################################
+    ########################################
 
-#     # 5초 딜레이
-#     time.sleep(5)
+    # 5초 딜레이
+    time.sleep(5)
 
 ######################################################################
