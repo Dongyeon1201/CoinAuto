@@ -85,7 +85,6 @@ while True:
 
     # 현재 소유중인 코인 이름 목록
     hold_coins = CoinAccount.GetHoldCoinList()
-    warning_coins = upbitUtil.GetWarningcoin()
 
     # 투자 유의 코인 이름 목록
     warning_coins = upbitUtil.GetWarningcoin()
@@ -99,9 +98,11 @@ while True:
                 SendSlackMessage(INFO_MESSAGE + "[+] {} 코인이 투자 유의 종목으로 지정되었습니다.\n확인을 권장드립니다.".format(CoinName))
 
             MYCOIN = CoinAccount.GetCoin(CoinName)
+            
+            logging.info("\t[-] {} 코인 / 매수 평균 : {}".format(MYCOIN.market_name, MYCOIN.buy_price))
 
             # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
-            if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price and \
+            if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price or \
                 upbitUtil.coins_info[CoinName]['trade_price'] < upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)):
                 
                 # 매도 가능한 수량 확인
