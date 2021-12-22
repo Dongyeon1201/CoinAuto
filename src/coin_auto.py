@@ -1,3 +1,4 @@
+from logging import warning
 from time import sleep
 from util import *
 from util import account
@@ -42,7 +43,14 @@ for CoinName in CoinAccount.watch_coin_list:
     if upbitUtil.isCoinHold(CoinName):
 
         # 나의 코인 목록 추가
-        CoinAccount.AddCoin(Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN))
+        MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
+        CoinAccount.AddCoin(MYCOIN)
+
+        # 평균 매수가 재 설정
+        MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
+
+        # 수익 실현 매수가 재 설정
+        MYCOIN.setReturnLinePrice()
 
 ##################################################
 
@@ -60,8 +68,10 @@ schedule.every().day.at("00:00:15").do(dailyExec)
 
 ##################################################
 
-# 최초 시작 시 MA 설정 함수 동작
+# 최초 시작 시 MA와 가격 설정 함수 동작
 dailyExec()
+asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
+asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
 # 시작 메세지 전송
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
@@ -74,13 +84,20 @@ while True:
     asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
     # 현재 소유중인 코인 이름 목록
-    hold_coin = CoinAccount.GetHoldCoinList()
+    hold_coins = CoinAccount.GetHoldCoinList()
+    warning_coins = upbitUtil.GetWarningcoin()
+
+    # 투자 유의 코인 이름 목록
+    warning_coins = upbitUtil.GetWarningcoin()
 
     for CoinName in CoinAccount.watch_coin_list:
 
         # 코인 보유 시(매도 조건 확인)
-        if CoinName in hold_coin:
-            
+        if CoinName in hold_coins:
+
+            if CoinName in warning_coins:
+                SendSlackMessage(INFO_MESSAGE + "[+] {} 코인이 투자 유의 종목으로 지정되었습니다.\n확인을 권장드립니다.".format(CoinName))
+
             MYCOIN = CoinAccount.GetCoin(CoinName)
 
             # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
@@ -99,6 +116,7 @@ while True:
                     # 코인 판매
                     upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, MYCOIN.current_price, headers)
                     
+                    # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
 
         # 코인 미 보유 시(매수 조건 확인)
@@ -124,6 +142,8 @@ while True:
 
                     # 코인 추가
                     MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
+
+                    # 보유 코인 목록 추가
                     CoinAccount.AddCoin(MYCOIN)
 
                     # 평균 매수가 재 설정

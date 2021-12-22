@@ -72,10 +72,17 @@ class UpbitUtil:
             else:
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : isCoinHold() ]\n[+] 현재 {} 의 소유 여부를 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
+    # 모든 코인의 목록 확인
     def getAllCoinList(self):
         headers = {"Accept": "application/json"}
-        res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=false", headers=headers)
-        return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market']]
+        res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=true", headers=headers)
+        return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market'] and item['market_warning'] == "NONE"]
+
+    # 투자 유의 종묙 코인 확인
+    def GetWarningcoin(self):
+        headers = {"Accept": "application/json"}
+        res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=true", headers=headers)
+        return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market'] and item['market_warning'] == "CAUTION"]
 
     # MarketName을 사용하여 해당 코인의 가격 반환
     def getCurrentPrice(self, market_name):
@@ -142,7 +149,7 @@ class UpbitUtil:
         
         # 평균 매수가 확인
         for item in res.json():
-            if item['currency'] == market_Name:
+            if item['currency'] == market_Name.split('-').pop():
                 return item['avg_buy_price']
         
         logging.error("[ Function Name : getBuyprice() ]\n[+] {} 코인의 평균매수가를 받아올 수 없습니다. STATUS CODE : {}".format(market_Name, res.status_code))
@@ -378,6 +385,7 @@ class UpbitUtil:
 
         return True
     
+    # 현재 가격을 웹 소켓을 통해 얻어온다.
     async def websocket_connect(self, market_items):
 
         # 웹 소켓에 접속을 합니다.
