@@ -92,6 +92,11 @@ while True:
 
     for CoinName in CoinAccount.watch_coin_list:
 
+        # 상장된지 30일도 되지 않은 코인은 거래하지 않음
+        # 사전에 MA값을 None으로 처리
+        if upbitUtil.coins_info[CoinName]['MA30'] == None and upbitUtil.coins_info[CoinName]['MA5'] == None:
+            continue
+
         # 코인 보유 시(매도 조건 확인)
         if CoinName in hold_coins:
 

@@ -358,14 +358,20 @@ class UpbitUtil:
         }
 
         res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        
+        # 상장된지 30일도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(res.json()) < count:
+            self.coins_info[market_name]['MA30'] = None
+            self.coins_info[market_name]['MA5'] = None
 
-        for item in res.json():
-            MA += item['trade_price']
+        else:
+            for item in res.json():
+                MA += item['trade_price']
 
-        if count == 30:
-            self.coins_info[market_name]['MA30'] = MA / 30
-        elif count == 5:
-            self.coins_info[market_name]['MA5'] = MA / 5
+            if count == 30:
+                self.coins_info[market_name]['MA30'] = MA / 30
+            elif count == 5:
+                self.coins_info[market_name]['MA5'] = MA / 5
     
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):
