@@ -85,6 +85,7 @@ while True:
 
     # 현재 소유중인 코인 이름 목록
     hold_coins = CoinAccount.GetHoldCoinList()
+    logging.info("보유 코인 목록 : {}".format(hold_coins))
 
     # 투자 유의 코인 이름 목록
     warning_coins = upbitUtil.GetWarningcoin()
@@ -97,9 +98,16 @@ while True:
             if CoinName in warning_coins:
                 SendSlackMessage(INFO_MESSAGE + "[+] {} 코인이 투자 유의 종목으로 지정되었습니다.\n확인을 권장드립니다.".format(CoinName))
 
+            # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
             
-            logging.info("\t[-] {} 코인 / 매수 평균 : {}".format(MYCOIN.market_name, MYCOIN.buy_price))
+            # 평균 매수가 재 설정
+            MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
+
+            # 수익 실현 매수가 재 설정
+            MYCOIN.setReturnLinePrice()
+            
+            logging.info("\t[-] {} 코인 / 매수 평균 : {} / 수익 실현 : {}".format(MYCOIN.market_name, MYCOIN.buy_price, MYCOIN.return_line_price))
 
             # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
             if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price or \
@@ -147,11 +155,11 @@ while True:
                     # 보유 코인 목록 추가
                     CoinAccount.AddCoin(MYCOIN)
 
-                    # 평균 매수가 재 설정
-                    MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
+                    # # 평균 매수가 재 설정
+                    # MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
-                    # 수익 실현 매수가 재 설정
-                    MYCOIN.setReturnLinePrice()
+                    # # 수익 실현 매수가 재 설정
+                    # MYCOIN.setReturnLinePrice()
 
                     logging.info("\t[-] {:,} 가격으로 ALL 매수 [ 코인 이름 : {} / isHold : {} ]".format(MYCOIN.return_line_price, MYCOIN.market_name, MYCOIN.is_coin_hold))
         
