@@ -1,16 +1,11 @@
-Package            Version
------------------- ---------
-certifi            2021.5.30
-cffi               1.14.6
-charset-normalizer 2.0.6
-cryptography       35.0.0
-idna               3.2
-pip                21.0.1
-pycparser          2.20
-PyJWT              2.1.0
-requests           2.26.0
-schedule           1.1.0
-setuptools         58.0.4
-urllib3            1.26.7
-websockets         10.1
-wheel              0.37.0
+certifi==2021.5.30
+cffi==1.14.6
+charset-normalizer==2.0.6
+cryptography==35.0.0
+idna==3.2
+pycparser==2.20
+PyJWT==2.1.0
+requests==2.26.0
+schedule==1.1.0
+urllib3==1.26.7
+websockets==10.1
