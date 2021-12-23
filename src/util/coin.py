@@ -58,8 +58,8 @@ class Coin:
 
     # 코인의 수익 실현 지점 가격
     # 예시 : 수익 실현률 5% 일때, 수익 실현 가격은 (평단가 * 1.05)
-    def setReturnLinePrice(self):
-        self.return_line_price = float(self.buy_price) * (1 + (self.coin_want_return / 100))
+    def setReturnLinePrice(self, return_price):
+        self.return_line_price = return_price
 
     def setExitLinePrice(self, set_price):
         self.exit_line_price = set_price
