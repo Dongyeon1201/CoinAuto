@@ -20,7 +20,7 @@ class Account:
         for i, item in enumerate(self.hold_coin_list):
             if item == coin:
                 self.hold_coin_list.pop(i)
-                self.hold_coin_list -= 1
+                self.num_hold_coins -= 1
 
     def GetCoin(self, market_name):
         for item in self.hold_coin_list:
