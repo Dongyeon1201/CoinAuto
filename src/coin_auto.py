@@ -119,7 +119,14 @@ while True:
             # 수익 실현 매수가 재 설정
             MYCOIN.setReturnLinePrice()
             
-            logging.info("\t[-] {} 코인 / 매수 평균 : {} / 수익 실현 : {}".format(MYCOIN.market_name, MYCOIN.buy_price, MYCOIN.return_line_price))
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t수익 실현 : {}\n\t손절 가격 : {}"
+            .format(
+                MYCOIN.market_name, 
+                upbitUtil.coins_info[CoinName]['trade_price'],
+                MYCOIN.buy_price,
+                MYCOIN.return_line_price,
+                upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100))
+            ))
 
             # 수익률 만족 or 5일선이 꺾일 때 [ 매도 ]
             if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price or \
