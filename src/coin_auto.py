@@ -118,9 +118,9 @@ while True:
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
+                MYCOIN.buy_price,
                 MYCOIN.jump_num + 1,
                 (MYCOIN.jump_num + 1) * 5,
-                MYCOIN.buy_price,
                 MYCOIN.return_line_price,
                 MYCOIN.exit_line_price
             ))
