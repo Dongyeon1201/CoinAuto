@@ -120,7 +120,7 @@ while True:
                 upbitUtil.coins_info[CoinName]['trade_price'],
                 MYCOIN.buy_price,
                 MYCOIN.jump_num + 1,
-                (MYCOIN.jump_num + 1) * 5,
+                (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                 MYCOIN.return_line_price,
                 MYCOIN.exit_line_price
             ))
@@ -140,9 +140,9 @@ while True:
                 logging.info("[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                     MYCOIN.market_name, 
                     MYCOIN.jump_num, 
-                    MYCOIN.jump_num * 5,
+                    MYCOIN.jump_num * MYCOIN.coin_want_return,
                     MYCOIN.jump_num + 1,
-                    (MYCOIN.jump_num + 1) * 5,
+                    (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                     MYCOIN.return_line_price,
                     MYCOIN.exit_line_price
                 ))
@@ -151,9 +151,9 @@ while True:
                 SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                     MYCOIN.market_name, 
                     MYCOIN.jump_num, 
-                    MYCOIN.jump_num * 5,
+                    MYCOIN.jump_num * MYCOIN.coin_want_return,
                     MYCOIN.jump_num + 1,
-                    (MYCOIN.jump_num + 1) * 5,
+                    (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                     MYCOIN.return_line_price,
                     MYCOIN.exit_line_price
                 ))
@@ -181,7 +181,7 @@ while True:
                         MYCOIN.market_name,
                         upbitUtil.coins_info[CoinName]['trade_price'],
                         MYCOIN.jump_num, 
-                        MYCOIN.jump_num * 5
+                        MYCOIN.jump_num * MYCOIN.coin_want_return
                     ))
 
                     # 슬랙으로 전달
@@ -189,7 +189,7 @@ while True:
                         MYCOIN.market_name,
                         upbitUtil.coins_info[CoinName]['trade_price'],
                         MYCOIN.jump_num, 
-                        MYCOIN.jump_num * 5
+                        MYCOIN.jump_num * MYCOIN.coin_want_return
                     ))
 
                     # 보유 코인 목록 삭제
@@ -235,7 +235,7 @@ while True:
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
                         MYCOIN.jump_num + 1, 
-                        MYCOIN.jump_num * 5,
+                        MYCOIN.jump_num * MYCOIN.coin_want_return,
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
@@ -244,7 +244,7 @@ while True:
                     SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
                         MYCOIN.jump_num, 
-                        MYCOIN.jump_num * 5,
+                        MYCOIN.jump_num * MYCOIN.coin_want_return,
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
