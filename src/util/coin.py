@@ -20,8 +20,8 @@ class Coin:
         # 코인 이름
         self.market_name = market_name
 
-        # 코인 보유 여부는 초기에 False로 설정
-        self.is_coin_hold = False
+        # 목표가 도달 횟수
+        self.jump_num = 0
 
     # 코인 이름(한글)을 입력받아 MarketName 반환
     def getMarketName(self, korean_name, monetary="KRW"):
@@ -61,6 +61,9 @@ class Coin:
     def setReturnLinePrice(self):
         self.return_line_price = float(self.buy_price) * (1 + (self.coin_want_return / 100))
 
+    def setExitLinePrice(self, set_price):
+        self.exit_line_price = set_price
+
     # 코인의 보유 여부 확인
     def setisCoinHold(self, is_coin_hold):
         self.is_coin_hold = is_coin_hold
@@ -90,3 +93,6 @@ class Coin:
 
     def setIsRise(self, isRise):
         self.isRise = isRise
+
+    def upJumpNum(self):
+        self.jump_num += 1
