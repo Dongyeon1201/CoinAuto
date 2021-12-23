@@ -220,6 +220,9 @@ while True:
                     # 보유 코인 목록 추가
                     CoinAccount.AddCoin(MYCOIN)
 
+                    # 구입 가격 설정
+                    MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
+
                     # 수익 실현 매수가 초기 설정
                     MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
 
@@ -229,7 +232,7 @@ while True:
                     # 로그 설정
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
-                        MYCOIN.jump_num, 
+                        MYCOIN.jump_num + 1, 
                         MYCOIN.jump_num * 5,
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
