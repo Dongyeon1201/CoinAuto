@@ -10,6 +10,8 @@ class Account:
         self.hold_coin_list = []
         self.num_hold_coins = 0
 
+        self.today_sell_coin_list = []
+
     def AddCoin(self, coin):
         self.hold_coin_list.append(coin)
         self.num_hold_coins += 1
@@ -32,3 +34,9 @@ class Account:
 
     def GetHoldCoinList(self):
         return [item.market_name for item in self.hold_coin_list]
+
+    def AddTodaySellList(self, market_name):
+        self.today_sell_coin_list.append(market_name)
+        
+    def ResetTodaySellList(self):
+        self.today_sell_coin_list = []

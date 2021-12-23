@@ -56,8 +56,11 @@ for CoinName in CoinAccount.watch_coin_list:
 
 #################### 스케줄 모음 ####################
 
-# 30일, 5일 MA 재설정 함수(스케줄에 사용)
+# 오늘 판매한 코인 목록 초기화 & 30일, 5일 MA 재설정 함수(스케줄에 사용)
 def dailyExec():
+
+    CoinAccount.ResetTodaySellList()
+
     for CoinName in CoinAccount.watch_coin_list:
         upbitUtil.setMA(CoinName, 5)
         upbitUtil.setMA(CoinName, 30)
@@ -97,6 +100,10 @@ while True:
         if upbitUtil.coins_info[CoinName]['MA30'] == None and upbitUtil.coins_info[CoinName]['MA5'] == None:
             continue
 
+        # 오늘 이미 판매한 코인들은 당일엔 더 이상 매수 / 매도를 하지 않음
+        if CoinName in CoinAccount.today_sell_coin_list:
+            continue
+
         # 코인 보유 시(매도 조건 확인)
         if CoinName in hold_coins:
 
@@ -130,8 +137,12 @@ while True:
                     # 코인 판매
                     upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, MYCOIN.current_price, headers)
                     
+                    # 오늘 판매한 코인 목록에 추가, 판매한 당일은 더이상 매수 / 매도를 하지 않음
+                    CoinAccount.AddTodaySellList(MYCOIN.market_name)
+
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
+
 
         # 코인 미 보유 시(매수 조건 확인)
         else:
