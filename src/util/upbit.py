@@ -1,3 +1,4 @@
+from util.account import Account
 from util.base import *
 from util.info import SendSlackMessage
 
@@ -101,7 +102,7 @@ class UpbitUtil:
             else:
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
-    # MarketName을 사용하여 해당 코인의 가격 반환
+    # MarketName을 사용하여 해당 코인의 당일 시가 반환
     def getTodayOpeningprice(self, market_name):
 
         param = {
@@ -182,12 +183,12 @@ class UpbitUtil:
         ALL_KRW = 0
 
         res = requests.get(self.server_url + "/v1/accounts", headers=self.getHeaders())
-        
+
         for item in res.json():
             if item['currency'] == 'KRW':
                 ALL_KRW += int(float(item['balance']))
             else:
-                ALL_KRW += float(item['balance']) * float(item['avg_buy_price'])
+                ALL_KRW += float(item['balance']) * float(self.getCurrentPrice("KRW-" + item['currency']))
         
         return int(ALL_KRW)
 
