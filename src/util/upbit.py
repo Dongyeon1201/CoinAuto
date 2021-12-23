@@ -1,4 +1,3 @@
-from util.account import Account
 from util.base import *
 from util.info import SendSlackMessage
 
