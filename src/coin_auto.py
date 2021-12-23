@@ -133,7 +133,7 @@ while True:
                 MYCOIN.setReturnLinePrice(MYCOIN.return_line_price * (1 + (MYCOIN.coin_want_return / 100)))
 
                 # 손절 가격을 기존 목표가로 설정
-                MYCOIN.setExitLinePrice(MYCOIN.return_line_price)
+                MYCOIN.setExitLinePrice(MYCOIN.return_line_price * (1 - (MYCOIN.down_line / 100)))
 
                 MYCOIN.upJumpNum()
 
