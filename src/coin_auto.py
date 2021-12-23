@@ -126,13 +126,13 @@ while True:
             # 수익률 만족 => 목표 가격 & 손절 가격 재설정
             if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price:
                 
-                # 재 목표 가격을 (기존 목표가 * 목표 상승률)값으로 재 설정
-                MYCOIN.setReturnLinePrice(MYCOIN.return_line_price * (1 + (MYCOIN.coin_want_return / 100)))
+                MYCOIN.upJumpNum()
 
                 # 손절 가격을 기존 목표가로 설정
                 MYCOIN.setExitLinePrice(MYCOIN.return_line_price * (1 - (MYCOIN.down_line / 100)))
 
-                MYCOIN.upJumpNum()
+                # 재 목표 가격을 (기존 목표가 * 목표 상승률)값으로 재 설정
+                MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + ((MYCOIN.coin_want_return * MYCOIN.jump_num + 1) / 100)))
 
                 # 로그 설정
                 logging.info("[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
