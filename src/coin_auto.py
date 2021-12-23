@@ -37,23 +37,6 @@ CoinAccount = Account(upbitUtil.getAllCoinList())
 # 전체 코인 정보 초기 설정
 upbitUtil.setCoinInfo()
 
-for CoinName in CoinAccount.watch_coin_list:
-
-    # 코인을 기존에 보유하고 있을 때 (가장 처음 실행만)
-    if upbitUtil.isCoinHold(CoinName):
-
-        # 나의 코인 목록 추가
-        MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
-        CoinAccount.AddCoin(MYCOIN)
-
-        # 평균 매수가 재 설정
-        MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
-
-        # 수익 실현 매수가 재 설정
-        MYCOIN.setReturnLinePrice()
-
-##################################################
-
 #################### 스케줄 모음 ####################
 
 # 오늘 판매한 코인 목록 초기화 & 30일, 5일 MA 재설정 함수(스케줄에 사용)
@@ -75,6 +58,24 @@ schedule.every().day.at("00:00:15").do(dailyExec)
 dailyExec()
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
+
+for CoinName in CoinAccount.watch_coin_list:
+
+    # 코인을 기존에 보유하고 있을 때 (가장 처음 실행만)
+    if upbitUtil.isCoinHold(CoinName):
+
+        # 나의 코인 목록 추가
+        MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN)
+        CoinAccount.AddCoin(MYCOIN)
+
+        # 평균 매수가 재 설정
+        MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
+
+        # 수익 실현 매수가 초기 설정
+        MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
+
+        # 손절 가격 초기 설정
+        MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)))
 
 # 시작 메세지 전송
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
