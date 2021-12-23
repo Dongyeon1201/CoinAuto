@@ -157,7 +157,6 @@ while True:
                     MYCOIN.return_line_price,
                     MYCOIN.exit_line_price
                 ))
-
             
             # 손절 가격 도달 시 매도
             elif upbitUtil.coins_info[CoinName]['trade_price'] < MYCOIN.exit_line_price:
@@ -176,6 +175,22 @@ while True:
                     
                     # 오늘 판매한 코인 목록에 추가, 판매한 당일은 더이상 매수 / 매도를 하지 않음
                     CoinAccount.AddTodaySellList(MYCOIN.market_name)
+
+                    # 로그 설정
+                    logging.info("[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                        MYCOIN.market_name,
+                        upbitUtil.coins_info[CoinName]['trade_price'],
+                        MYCOIN.jump_num, 
+                        MYCOIN.jump_num * 5
+                    ))
+
+                    # 슬랙으로 전달
+                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                        MYCOIN.market_name,
+                        upbitUtil.coins_info[CoinName]['trade_price'],
+                        MYCOIN.jump_num, 
+                        MYCOIN.jump_num * 5
+                    ))
 
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
@@ -215,6 +230,15 @@ while True:
 
                     # 로그 설정
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                        MYCOIN.market_name, 
+                        MYCOIN.jump_num, 
+                        MYCOIN.jump_num * 5,
+                        MYCOIN.return_line_price,
+                        MYCOIN.exit_line_price
+                    ))
+
+                    # SLACK 설정
+                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
                         MYCOIN.jump_num, 
                         MYCOIN.jump_num * 5,
