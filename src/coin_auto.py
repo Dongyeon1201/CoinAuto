@@ -142,7 +142,7 @@ while True:
                     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
                     # 코인 판매
-                    upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, MYCOIN.current_price, headers)
+                    upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
                     
                     # 오늘 판매한 코인 목록에 추가, 판매한 당일은 더이상 매수 / 매도를 하지 않음
                     CoinAccount.AddTodaySellList(MYCOIN.market_name)
