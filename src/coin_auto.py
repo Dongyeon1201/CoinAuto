@@ -114,7 +114,7 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차목표가(+%{}) : {}\n\t손절 가격 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
