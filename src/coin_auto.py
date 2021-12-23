@@ -50,7 +50,7 @@ def dailyExec():
         time.sleep(0.5)
 
 # 매일 0시에 각 MA 재 설정(15초 딜레이)
-schedule.every().day.at("00:00:15").do(dailyExec)
+schedule.every().day.at("09:00:15").do(dailyExec)
 
 ##################################################
 
