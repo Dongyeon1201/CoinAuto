@@ -113,10 +113,7 @@ while True:
 
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
-            
-            # 평균 매수가 재 설정
-            MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
-            
+                        
             logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t수익 실현 : {}\n\t손절 가격 : {}"
             .format(
                 MYCOIN.market_name, 
