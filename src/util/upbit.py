@@ -85,21 +85,22 @@ class UpbitUtil:
         return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market'] and item['market_warning'] == "CAUTION"]
 
     # MarketName을 사용하여 해당 코인의 가격 반환
-    def getCurrentPrice(self, market_name):
+    async def getCurrentPrice(self, market_name):
 
-        res = requests.get(self.server_url + "/v1/ticker", params={'markets' : market_name})
+        # 웹 소켓에 접속을 합니다.
+        async with websockets.connect(WEBSOCKET_URL) as websocket:        
 
-        if res.status_code == 200:
-            current_price = res.json()[0]['trade_price']
-            return current_price
+            send_data = str([{"ticket":"GetPrice"},{"type":"ticker","codes":[market_name]}])
+            await websocket.send(send_data)
         
-        else:
-            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))
-
-            if res.text == None:
+            # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
+            data = await websocket.recv()
+            
+            if data == None:
                 SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```NONE```".format(res.status_code))
             else:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+                data = json.loads(data.decode('utf-8'))
+                return data['trade_price']
 
     # MarketName을 사용하여 해당 코인의 당일 시가 반환
     def getTodayOpeningprice(self, market_name):
@@ -187,7 +188,8 @@ class UpbitUtil:
             if item['currency'] == 'KRW':
                 ALL_KRW += int(float(item['balance']))
             else:
-                ALL_KRW += float(item['balance']) * float(self.getCurrentPrice("KRW-" + item['currency']))
+                current_price = asyncio.get_event_loop().run_until_complete(self.getCurrentPrice("KRW-" + item['currency']))
+                ALL_KRW += float(item['balance']) * float(current_price)
         
         return int(ALL_KRW)
 
