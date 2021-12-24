@@ -85,22 +85,35 @@ class UpbitUtil:
         return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market'] and item['market_warning'] == "CAUTION"]
 
     # MarketName을 사용하여 해당 코인의 가격 반환
-    async def getCurrentPrice(self, market_name):
+    async def getCurrentPrice(self, market_items):
+
+        current_price_info = {}
 
         # 웹 소켓에 접속을 합니다.
         async with websockets.connect(WEBSOCKET_URL) as websocket:        
 
-            send_data = str([{"ticket":"GetPrice"},{"type":"ticker","codes":[market_name]}])
+            send_data = str([{"ticket":"CurrentPrice"},{"type":"ticker","isOnlySnapshot":True,"codes": market_items}])
             await websocket.send(send_data)
         
             # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
-            data = await websocket.recv()
-            
-            if data == None:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```NONE```".format(res.status_code))
-            else:
+            for item in market_items:
+                data = await websocket.recv()
                 data = json.loads(data.decode('utf-8'))
-                return data['trade_price']
+                current_price_info[item] = data['trade_price']
+            
+            return current_price_info
+
+            # send_data = str([{"ticket":"GetPrice"},{"type":"ticker","isOnlySnapshot":True,"codes":[market_name]}])
+            # await websocket.send(send_data)
+        
+            # # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
+            # data = await websocket.recv()
+            
+            # if data == None:
+            #     SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```NONE```".format(res.status_code))
+            # else:
+            #     data = json.loads(data.decode('utf-8'))
+            #     return data['trade_price']
 
     # MarketName을 사용하여 해당 코인의 당일 시가 반환
     def getTodayOpeningprice(self, market_name):
@@ -184,12 +197,17 @@ class UpbitUtil:
 
         res = requests.get(self.server_url + "/v1/accounts", headers=self.getHeaders())
 
-        for item in res.json():
-            if item['currency'] == 'KRW':
-                ALL_KRW += int(float(item['balance']))
-            else:
-                current_price = asyncio.get_event_loop().run_until_complete(self.getCurrentPrice("KRW-" + item['currency']))
-                ALL_KRW += float(item['balance']) * float(current_price)
+        account_info = res.json()
+
+        if account_info[0]['currency'] == 'KRW':
+            ALL_KRW += int(float(account_info[0]['balance']))
+            account_info.pop(0)
+
+        hold_coin_names = ["KRW-" + item['currency'] for item in account_info]
+        hold_coin_current_price = asyncio.get_event_loop().run_until_complete(self.getCurrentPrice(hold_coin_names))
+
+        for item in account_info:
+            ALL_KRW += float(item['balance']) * float(hold_coin_current_price["KRW-" + item['currency']])
         
         return int(ALL_KRW)
 
@@ -399,18 +417,18 @@ class UpbitUtil:
         # 웹 소켓에 접속을 합니다.
         async with websockets.connect(WEBSOCKET_URL) as websocket:        
 
+            send_data = str([{"ticket":"GetPrice"},{"type":"ticker","isOnlySnapshot":True,"codes": market_items}])
+            await websocket.send(send_data)
+            
             for market_name in market_items:
-
-                send_data = str([{"ticket":"GetPrice"},{"type":"ticker","codes":[market_name]}])
-                await websocket.send(send_data)
             
                 # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
                 try:
                     data = await websocket.recv()
                     data = json.loads(data.decode('utf-8'))
 
-                    self.coins_info[data['code']]["trade_price"] = data['trade_price']
-                    self.coins_info[data['code']]["opening_price"] = data['opening_price']
+                    self.coins_info[data['code']]['trade_price'] = data['trade_price']
+                    self.coins_info[data['code']]['opening_price'] = data['opening_price']
 
                 except websockets.ConnectionClosed:
                     break
