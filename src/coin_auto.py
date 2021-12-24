@@ -235,7 +235,7 @@ while True:
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
                         MYCOIN.jump_num + 1, 
-                        MYCOIN.jump_num * MYCOIN.coin_want_return,
+                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
@@ -243,8 +243,8 @@ while True:
                     # SLACK 설정
                     SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
                         MYCOIN.market_name, 
-                        MYCOIN.jump_num, 
-                        MYCOIN.jump_num * MYCOIN.coin_want_return,
+                        MYCOIN.jump_num + 1, 
+                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
