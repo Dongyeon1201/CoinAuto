@@ -75,7 +75,7 @@ for CoinName in CoinAccount.watch_coin_list:
         MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
 
         # 손절 가격 초기 설정
-        MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)))
+        MYCOIN.setExitLinePrice(MYCOIN.buy_price * (1 - (MYCOIN.down_line / 100)))
 
 # 시작 메세지 전송
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
