@@ -229,7 +229,7 @@ while True:
                     MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
 
                     # 손절 가격 초기 설정
-                    MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['MA5'] * (1 - (MYCOIN.down_line / 100)))
+                    MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.down_line / 100)))
 
                     # 로그 설정
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
