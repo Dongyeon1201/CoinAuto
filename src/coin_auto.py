@@ -210,6 +210,9 @@ while True:
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
 
+                    # 매수 가능한 현금량 갱신
+                    current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+
         # 코인 미 보유 시(매수 조건 확인)
         else:
 
