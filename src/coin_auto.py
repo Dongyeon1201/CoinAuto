@@ -213,7 +213,11 @@ while True:
             if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
 
-                time.sleep(1)
+                # 최소 주문 금액인 5000원 이상이 존재할 때
+                if current_krw < 5000:
+                    continue
+
+                time.sleep(0.5)
 
                 # 매수 가능한 현금 확인
                 current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
