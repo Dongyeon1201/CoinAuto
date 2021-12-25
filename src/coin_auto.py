@@ -65,6 +65,11 @@ schedule.every().hour.at(":00").do(everyhourExec)
 everyhourExec()
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
+time.sleep(1)
+
+# 매수 가능한 현금 확인
+current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+
 for CoinName in CoinAccount.watch_coin_list:
 
     # 코인을 기존에 보유하고 있을 때 (가장 처음 실행만)
