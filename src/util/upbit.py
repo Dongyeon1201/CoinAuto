@@ -377,9 +377,10 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
-        # 상장된지 30일도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
         if len(res.json()) < count:
             self.coins_info[market_name]['MA30'] = None
             self.coins_info[market_name]['MA5'] = None
