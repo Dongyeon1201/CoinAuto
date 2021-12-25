@@ -88,12 +88,14 @@ SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
 
 ##################### 무한 반복 (5초마다 가격 확인 후 동작) ####################
 
+
 while True:
 
+    # 3초 딜레이
+    time.sleep(3)
+    
     # 코인의 현재 가격과 시가 설정
     asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
-
-    time.sleep(1)
 
     # 현재 소유중인 코인 이름 목록
     hold_coins = CoinAccount.GetHoldCoinList()
@@ -211,6 +213,8 @@ while True:
             if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
 
+                time.sleep(1)
+
                 # 매수 가능한 현금 확인
                 current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
                 
@@ -265,8 +269,5 @@ while True:
     schedule.run_pending()
 
     ########################################
-
-    # 3초 딜레이
-    time.sleep(3)
 
 ######################################################################
