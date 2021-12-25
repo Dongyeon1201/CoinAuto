@@ -64,7 +64,6 @@ schedule.every().hour.at(":00").do(everyhourExec)
 # 최초 시작 시 MA와 가격 설정 함수 동작
 everyhourExec()
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
-asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
 for CoinName in CoinAccount.watch_coin_list:
 
@@ -91,11 +90,10 @@ SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
 
 while True:
 
-    # # 5초 딜레이
-    time.sleep(3)
-
     # 코인의 현재 가격과 시가 설정
     asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
+
+    time.sleep(1)
 
     # 현재 소유중인 코인 이름 목록
     hold_coins = CoinAccount.GetHoldCoinList()
@@ -213,8 +211,10 @@ while True:
             if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
 
-                # 매수 가능한 수량 확인
+                # 매수 가능한 현금 확인
                 current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+                
+                # 매수 가능한 수량 확인
                 orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
                 # 매수 가능한 수량이 있을 때
@@ -265,5 +265,8 @@ while True:
     schedule.run_pending()
 
     ########################################
+
+    # 3초 딜레이
+    time.sleep(3)
 
 ######################################################################
