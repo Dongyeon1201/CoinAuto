@@ -3,7 +3,7 @@ from util.info import SendSlackMessage
 
 class Coin:
 
-    def __init__(self, market_name, coin_proportion, want_return, down_line):
+    def __init__(self, market_name, coin_proportion, want_return, down_line, first_down_line):
 
         # 서버 주소
         self.server_url = API_SERVER_URL    
@@ -14,8 +14,11 @@ class Coin:
         # 해당 코인의 원하는 수익률
         self.coin_want_return = want_return
 
-        # 코인이 5일선에서 몇% 떨어졌을 때 매도할지 수치
+        # 목표가에서 몇% 떨어졌을 때 매도할지 수치
         self.down_line = down_line
+
+        # 코인 매수 후, 매수가에서 몇프로 떨어졌을 떄 매도할지 수치
+        self.first_down_line = first_down_line
 
         # 코인 이름
         self.market_name = market_name
