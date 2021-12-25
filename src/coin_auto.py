@@ -129,7 +129,7 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA30 : {}\n\tMA5 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
@@ -137,7 +137,9 @@ while True:
                 MYCOIN.jump_num + 1,
                 (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                 MYCOIN.return_line_price,
-                MYCOIN.exit_line_price
+                MYCOIN.exit_line_price,
+                upbitUtil.coins_info[CoinName]['MA30'],
+                upbitUtil.coins_info[CoinName]['MA5']
             ))
 
             # 수익률 만족 => 목표 가격 & 손절 가격 재설정
@@ -219,7 +221,8 @@ while True:
             # 현재 가격이 30일선 넘을 때 [ 매수 ]
             # 시가가 30일선 밑 일때
             if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
-                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30']:
+                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30'] and \
+                upbitUtil.coins_info[CoinName]['MA30'] > upbitUtil.coins_info[CoinName]['MA5']:
 
                 # 최소 주문 금액인 5000원 이상이 존재할 때
                 if current_krw < 5000:
