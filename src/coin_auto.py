@@ -91,6 +91,9 @@ SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
 
 while True:
 
+    # # 5초 딜레이
+    time.sleep(3)
+
     # 코인의 현재 가격과 시가 설정
     asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
@@ -262,8 +265,5 @@ while True:
     schedule.run_pending()
 
     ########################################
-
-    # # 5초 딜레이
-    time.sleep(3)
 
 ######################################################################
