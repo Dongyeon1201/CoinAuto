@@ -68,8 +68,8 @@ def dailyExec():
     CoinAccount.ResetTodaySellList()
 
     for CoinName in CoinAccount.watch_coin_list:
-        upbitUtil.setMA(CoinName, 5)
-        upbitUtil.setMA(CoinName, 30)
+        upbitUtil.setMA(CoinName, 5, without_last=True)
+        upbitUtil.setMA(CoinName, 30, without_last=True)
         time.sleep(0.5)
 
 ######################################################
@@ -131,8 +131,8 @@ while True:
     for CoinName in CoinAccount.watch_coin_list:
 
         # 상장된지 30일도 되지 않은 코인은 거래하지 않음
-        # 사전에 MA값을 None으로 처리
-        if upbitUtil.coins_info[CoinName]['MA30'] == None and upbitUtil.coins_info[CoinName]['MA5'] == None:
+        # 사전에 trade_able값을 None으로 처리
+        if upbitUtil.coins_info[CoinName]['trade_able'] == False:
             continue
 
         # 오늘 이미 판매한 코인들은 당일엔 더 이상 매수 / 매도를 하지 않음
@@ -239,9 +239,14 @@ while True:
 
             # 현재 가격이 30일선 넘을 때 [ 매수 ]
             # 시가가 30일선 밑 일때
-            if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
-                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30'] and \
-                upbitUtil.coins_info[CoinName]['MA30'] > upbitUtil.coins_info[CoinName]['MA5']:
+            # if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
+            #     upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30'] and \
+            #     upbitUtil.coins_info[CoinName]['MA30'] > upbitUtil.coins_info[CoinName]['MA5']:
+
+            Current_MA30 = ((upbitUtil.coins_info[CoinName]['MA30'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
+            Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
+
+            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (0.1/100)):
 
                 # 최소 주문 금액인 5000원 이상이 존재할 때
                 if current_krw < 5000:

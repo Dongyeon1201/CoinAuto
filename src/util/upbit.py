@@ -369,7 +369,9 @@ class UpbitUtil:
             }
 
     # MA 구하기
-    def setMA(self, market_name, count):
+    # without_last : 가장 최근 캔들에 대한 정보를 제외한 MA를 구해준다.
+    # 30개 요청 후 without_last True로 실행 시 -> 가장 최근 캔들을 제외한 29개의 MA가 반환
+    def setMA(self, market_name, count, without_last=False):
 
         MA = 0
 
@@ -381,19 +383,20 @@ class UpbitUtil:
         res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
         # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
-        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
-        if len(res.json()) < count:
-            self.coins_info[market_name]['MA30'] = None
-            self.coins_info[market_name]['MA5'] = None
+        array = res.json()
 
+        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(array) < count:
+            self.coins_info[market_name]['trade_able'] = False
+        
         else:
-            for item in res.json():
+            if without_last: 
+                del array[0]
+
+            for item in array:
                 MA += item['trade_price']
 
-            if count == 30:
-                self.coins_info[market_name]['MA30'] = MA / 30
-            elif count == 5:
-                self.coins_info[market_name]['MA5'] = MA / 5
+            self.coins_info[market_name]['MA{}'.format(count)] = MA / count
     
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):
