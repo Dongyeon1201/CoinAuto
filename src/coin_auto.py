@@ -45,31 +45,12 @@ upbitUtil.setCoinInfo()
 
 #################### 60분봉 스케줄 모음 ####################
 
-# # 오늘 판매한 코인 목록 초기화
-# def dailyExec():
-#     CoinAccount.ResetTodaySellList()
-
-# # MA 재설정 함수(스케줄에 사용)
-# def everyhourExec():
-#     for CoinName in CoinAccount.watch_coin_list:
-#         upbitUtil.setMA(CoinName, 5)
-#         upbitUtil.setMA(CoinName, 30)
-#         time.sleep(0.5)
-
-# # 매일 0시에 각 MA 재 설정(15초 딜레이)
-# schedule.every().day.at("09:00:15").do(dailyExec)
-
-# # 매 시간 MA 초기화
-# schedule.every().hour.at(":00").do(everyhourExec)
-
-######################################################
-
-#################### 일봉 스케줄 모음 ####################
-
 # 오늘 판매한 코인 목록 초기화
 def dailyExec():
     CoinAccount.ResetTodaySellList()
 
+# MA 재설정 함수(스케줄에 사용)
+def everyhourExec():
     for CoinName in CoinAccount.watch_coin_list:
         upbitUtil.setMA(CoinName, 5, without_last=True)
         upbitUtil.setMA(CoinName, 30, without_last=True)
@@ -77,10 +58,31 @@ def dailyExec():
         upbitUtil.setMA(CoinName, 31, without_last=True, Name="Before_MA")
         time.sleep(0.5)
 
-######################################################
-
 # 매일 0시에 각 MA 재 설정(15초 딜레이)
 schedule.every().day.at("09:00:15").do(dailyExec)
+
+# 매 시간 MA 초기화
+schedule.every().hour.at(":00").do(everyhourExec)
+
+######################################################
+
+#################### 일봉 스케줄 모음 ####################
+
+# 오늘 판매한 코인 목록 초기화
+# def dailyExec():
+#     CoinAccount.ResetTodaySellList()
+
+#     for CoinName in CoinAccount.watch_coin_list:
+#         upbitUtil.setMA(CoinName, 5, without_last=True)
+#         upbitUtil.setMA(CoinName, 30, without_last=True)
+#         upbitUtil.setMA(CoinName, 6, without_last=True, Name="Before_MA")
+#         upbitUtil.setMA(CoinName, 31, without_last=True, Name="Before_MA")
+#         time.sleep(0.5)
+
+# ######################################################
+
+# # 매일 0시에 각 MA 재 설정(15초 딜레이)
+# schedule.every().day.at("09:00:15").do(dailyExec)
 
 ##################################################
 
