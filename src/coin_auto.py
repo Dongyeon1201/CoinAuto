@@ -73,6 +73,8 @@ def dailyExec():
     for CoinName in CoinAccount.watch_coin_list:
         upbitUtil.setMA(CoinName, 5, without_last=True)
         upbitUtil.setMA(CoinName, 30, without_last=True)
+        upbitUtil.setMA(CoinName, 6, without_last=True, Name="Before_MA")
+        upbitUtil.setMA(CoinName, 31, without_last=True, Name="Before_MA")
         time.sleep(0.5)
 
 ######################################################
@@ -249,7 +251,8 @@ while True:
             Current_MA30 = ((upbitUtil.coins_info[CoinName]['MA30'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
             Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
 
-            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (INPUT_COIN_BUYRANGE/100)):
+            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
+                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA30']:
 
                 # 최소 주문 금액인 5000원 이상이 존재할 때
                 if current_krw < 5000:

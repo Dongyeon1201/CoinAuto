@@ -371,7 +371,7 @@ class UpbitUtil:
     # MA 구하기
     # without_last : 가장 최근 캔들에 대한 정보를 제외한 MA를 구해준다.
     # 30개 요청 후 without_last True로 실행 시 -> 가장 최근 캔들을 제외한 29개의 MA가 반환
-    def setMA(self, market_name, count, without_last=False):
+    def setMA(self, market_name, count, without_last=False, Name="MA"):
 
         MA = 0
 
@@ -397,10 +397,10 @@ class UpbitUtil:
                 MA += item['trade_price']
 
             if without_last:
-                self.coins_info[market_name]['MA{}'.format(count)] = MA / (count -1)
+                self.coins_info[market_name]['{}{}'.format(Name, count)] = MA / (count -1)
             else:
-                self.coins_info[market_name]['MA{}'.format(count)] = MA / count
-                
+                self.coins_info[market_name]['{}{}'.format(Name, count)] = MA / count
+
             self.coins_info[market_name]['trade_able'] = True
 
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
