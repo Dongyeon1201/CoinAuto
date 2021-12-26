@@ -64,6 +64,8 @@ schedule.every().day.at("09:00:15").do(dailyExec)
 # 매 시간 MA 초기화
 schedule.every().hour.at(":00").do(everyhourExec)
 
+everyhourExec()
+
 ######################################################
 
 #################### 일봉 스케줄 모음 ####################
@@ -87,7 +89,7 @@ schedule.every().hour.at(":00").do(everyhourExec)
 ##################################################
 
 # 최초 시작 시 MA와 가격 설정 함수 동작
-dailyExec()
+# dailyExec()
 
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
