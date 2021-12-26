@@ -397,7 +397,8 @@ class UpbitUtil:
                 MA += item['trade_price']
 
             self.coins_info[market_name]['MA{}'.format(count)] = MA / count
-    
+            self.coins_info[market_name]['trade_able'] = True
+
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):
 
