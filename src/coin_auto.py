@@ -54,8 +54,8 @@ def everyhourExec():
     for CoinName in CoinAccount.watch_coin_list:
         upbitUtil.setMA(CoinName, 5, without_last=True)
         upbitUtil.setMA(CoinName, 30, without_last=True)
-        upbitUtil.setMA(CoinName, 6, without_last=True, Name="Before_MA")
-        upbitUtil.setMA(CoinName, 31, without_last=True, Name="Before_MA")
+        upbitUtil.setBeforeMA(CoinName, 5)
+        upbitUtil.setBeforeMA(CoinName, 30)
         time.sleep(0.5)
 
 # 매일 0시에 각 MA 재 설정(15초 딜레이)

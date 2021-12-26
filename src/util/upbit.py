@@ -371,7 +371,7 @@ class UpbitUtil:
     # MA 구하기
     # without_last : 가장 최근 캔들에 대한 정보를 제외한 MA를 구해준다.
     # 30개 요청 후 without_last True로 실행 시 -> 가장 최근 캔들을 제외한 29개의 MA가 반환
-    def setMA(self, market_name, count, without_last=False, Name="MA"):
+    def setMA(self, market_name, count, without_last=False):
 
         MA = 0
 
@@ -397,10 +397,38 @@ class UpbitUtil:
                 MA += item['trade_price']
 
             if without_last:
-                self.coins_info[market_name]['{}{}'.format(Name, count)] = MA / (count -1)
+                self.coins_info[market_name]['MA{}'.format(count)] = MA / (count-1)
             else:
-                self.coins_info[market_name]['{}{}'.format(Name, count)] = MA / count
+                self.coins_info[market_name]['MA{}'.format(count)] = MA / count
 
+            self.coins_info[market_name]['trade_able'] = True
+
+    # 현재를 제외한 count 갯수의 캔들에 대한 정보를 얻어온다.
+    def setBeforeMA(self, market_name, count):
+
+        MA = 0
+
+        param = {
+            "count": count+1,
+            "market" : market_name
+        }
+
+        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        
+        array = res.json()
+
+        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(array) < count:
+            self.coins_info[market_name]['trade_able'] = False
+        
+        else:
+            del array[0]
+
+            for item in array:
+                MA += item['trade_price']
+
+            self.coins_info[market_name]['Before_MA{}'.format(count)] = MA / count
             self.coins_info[market_name]['trade_able'] = True
 
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
