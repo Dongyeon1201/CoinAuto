@@ -20,11 +20,13 @@ def get_arguments():
     parser.add_argument('-w', '--want', required=False, default=10, help='원하는 수익률(퍼센트)', dest='want')
     parser.add_argument('-d', '--down', required=False, default=1.5, help='목표가에서 얼마나 떨어지면 매도할지 퍼센트', dest='down')
     parser.add_argument('-f', '--firstdown', required=False, default=3, help='매수가에서 얼마나 떨어지면 매도할지 퍼센트', dest='firstdown')
+    parser.add_argument('-b', '--buyrange', required=False, default=0.1, help='5일선이 30일선에 어느 범위 안에 있을때만 구매할 지 설정', dest='buyrange')
    
     return_arg_data['percent'] = parser.parse_args().percent
     return_arg_data['want'] = parser.parse_args().want
     return_arg_data['down'] = parser.parse_args().down
     return_arg_data['firstdown'] = parser.parse_args().firstdown
+    return_arg_data['buyrange'] = parser.parse_args().buyrange
 
     return return_arg_data
 
@@ -33,6 +35,7 @@ INPUT_COIN_PROPORTION = float(get_arguments()['percent'])
 INPUT_COIN_WANT = float(get_arguments()['want'])
 INPUT_COIN_DOWN = float(get_arguments()['down'])
 INPUT_COIN_FIRST_DOWN = float(get_arguments()['firstdown'])
+INPUT_COIN_BUYRANGE = float(get_arguments()['buyrange'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 CoinAccount = Account(upbitUtil.getAllCoinList())
@@ -246,7 +249,7 @@ while True:
             Current_MA30 = ((upbitUtil.coins_info[CoinName]['MA30'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
             Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
 
-            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (0.1/100)):
+            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (INPUT_COIN_BUYRANGE/100)):
 
                 # 최소 주문 금액인 5000원 이상이 존재할 때
                 if current_krw < 5000:
