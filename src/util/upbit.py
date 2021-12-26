@@ -123,8 +123,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
         if res.status_code == 200:
             return res.json().pop()['opening_price']
@@ -378,8 +378,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
         # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
         if len(res.json()) < count:
@@ -403,8 +403,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
 
         for item in res.json():
 
