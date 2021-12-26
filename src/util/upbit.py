@@ -396,7 +396,11 @@ class UpbitUtil:
             for item in array:
                 MA += item['trade_price']
 
-            self.coins_info[market_name]['MA{}'.format(count)] = MA / count
+            if without_last:
+                self.coins_info[market_name]['MA{}'.format(count)] = MA / (count -1)
+            else:
+                self.coins_info[market_name]['MA{}'.format(count)] = MA / count
+                
             self.coins_info[market_name]['trade_able'] = True
 
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
