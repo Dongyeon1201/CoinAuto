@@ -123,8 +123,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
         if res.status_code == 200:
             return res.json().pop()['opening_price']
@@ -380,8 +380,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
         array = res.json()
 
@@ -413,8 +413,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
         
         array = res.json()
 
@@ -439,8 +439,8 @@ class UpbitUtil:
             "market" : market_name
         }
 
-        # res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
 
         for item in res.json():
 
