@@ -78,7 +78,7 @@ class UpbitUtil:
         res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=true", headers=headers)
         return [item['market'] for item in json.loads(res.text) if "KRW-" in item['market'] and item['market_warning'] == "NONE"]
 
-    # 투자 유의 종묙 코인 확인
+    # 투자 유의 종목 코인 확인
     def GetWarningcoin(self):
         headers = {"Accept": "application/json"}
         res = requests.request("GET", API_SERVER_URL + "/v1/market/all?isDetails=true", headers=headers)
@@ -150,12 +150,12 @@ class UpbitUtil:
             return res.json()
 
         else:
-            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}".format(res.status_code))
+            logging.error("[ Function Name : getWaitOrderList() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}".format(res.status_code))
 
             if res.text == None:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code))
+                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getWaitOrderList() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code))
             else:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getWaitOrderList() ]\n[+] 주문 목록을 받아올 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
 
     # MarketName을 이용하여 해당 코인의 평균 매수가 확인
     def getBuyprice(self, market_Name):
@@ -297,6 +297,72 @@ class UpbitUtil:
             if res.status_code == 201:
                 logging.info("{} 코인 {:,} 가격에 ALL 매도 완료".format(market_name, order_price))
                 SendSlackMessage(INFO_MESSAGE + "{} 코인 *{:,}* 가격에 ALL 매도 완료".format(market_name, order_price))
+
+            else:
+                logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
+
+                if res.text == None:
+                    SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code))
+                else:
+                    SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+
+    # 시장가 코인 주문
+    # order_krw : 총 주문 금액(10만원 주문 시 100000 으로 설정) [시장가 매수에 사용]
+    # orderable_volume : 총 매도할 코인의 갯수 [시장가 매도에 사용] 
+    def orderMarketCoin(self, market_name, order_side, headers, orderable_volume=None, order_krw=None):
+
+        query = {
+            'market': market_name,
+        }
+
+        # 매수
+        if order_side == "bid":
+            
+            # 매수로 설정
+            query['side'] = "bid"
+
+            # 시장가 매수 주문 설정
+            query['ord_type'] = 'price'
+
+            # 총 주문 금액을 설정
+            query['price'] = order_krw
+
+            # 주문 요청을 위한 헤더 생성
+            headers = self.getHeaders(query=query)
+            res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
+
+            if res.status_code == 201:
+
+                logging.info("{} 코인 매수 완료".format(market_name))
+                SendSlackMessage(INFO_MESSAGE + "{} 코인 매수 완료".format(market_name))
+
+            else:
+                logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))
+
+                if res.text == None:
+                    SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code))
+                else:
+                    SendSlackMessage(ERROR_MESSAGE + "[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(market_name, res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+
+        # 매도
+        elif order_side == "ask":
+            
+            # 매도로 설정
+            query['side'] = "ask"
+
+            # 시장가 매도 주문 설정
+            query['ord_type'] = 'market'
+
+            # 총 주문할 양을 설정
+            query['volume'] = orderable_volume
+
+            # 주문 요청을 위한 헤더 생성
+            headers = self.getHeaders(query=query)
+            res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
+
+            if res.status_code == 201:
+                logging.info("{} 코인 매도 완료".format(market_name))
+                SendSlackMessage(INFO_MESSAGE + "{} 코인 매도 완료".format(market_name))
 
             else:
                 logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매도를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))

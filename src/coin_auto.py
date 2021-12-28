@@ -215,8 +215,11 @@ while True:
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
-                    # 코인 판매
-                    upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
+                    # 코인 판매 [시장가 매도]
+                    upbitUtil.orderMarketCoin(CoinName, SELL, orderable_volume=orderable_volume, headers=headers)
+
+                    # 코인 구입 [지정가 매도]
+                    # upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
                     
                     # 오늘 판매한 코인 목록에 추가, 판매한 당일은 더이상 매수 / 매도를 하지 않음
                     CoinAccount.AddTodaySellList(MYCOIN.market_name)
@@ -267,8 +270,8 @@ while True:
                 # 매수 가능한 현금 확인
                 current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
                 
-                # 매수 가능한 수량 확인
-                orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
+                # 매수 가능한 수량 확인 [지정가 매수에 사용]
+                # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
                 # 매수 가능한 수량이 있을 때
                 if orderable_volume > 0:
@@ -276,8 +279,11 @@ while True:
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': CoinName})
 
-                    # 코인 구입
-                    upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
+                    # 코인 구입 [시장가 매수]
+                    upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=current_krw, headers=headers)
+
+                    # 코인 구입 [지정가 매수]
+                    # upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
 
                     # 코인 추가
                     MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN, INPUT_COIN_FIRST_DOWN)
