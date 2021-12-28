@@ -22,12 +22,12 @@ def truncate(num,n):
                 return float(temp)      
     return float(temp)
 
-# logging.basicConfig(
-#     filename='/usr/src/app/logs/coin.log',
-#     level=logging.INFO,
-#     format = '%(asctime)s:%(levelname)s:%(message)s',
-#     datefmt = '%Y-%m-%d %H:%M:%S %p',
-# )
+logging.basicConfig(
+    filename='/usr/src/app/logs/coin.log',
+    level=logging.INFO,
+    format = '%(asctime)s:%(levelname)s:%(message)s',
+    datefmt = '%Y-%m-%d %H:%M:%S %p',
+)
 
 API_SERVER_URL = "https://api.upbit.com"
 WEBSOCKET_URL = "wss://api.upbit.com/websocket/v1"
