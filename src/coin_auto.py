@@ -274,7 +274,9 @@ while True:
                 # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
                 # 매수 가능한 수량이 있을 때
-                if orderable_volume > 0:
+                # if orderable_volume > 0:
+
+                if current_krw > 5000:
 
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': CoinName})

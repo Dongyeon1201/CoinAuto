@@ -13,7 +13,16 @@ CoinAccount = Account(upbitUtil.getAllCoinList())
 CoinName = "KRW-BTC"
 
 # 주문을 위한 헤더 설정
-headers = upbitUtil.getHeaders(query={'market': CoinName})
+query = {
+    'state': 'wait',
+}
+headers = upbitUtil.getHeaders(query=query)
+
+res = requests.get(API_SERVER_URL + "/v1/orders", params=query, headers=headers)
+
+print(res.json())
+
+# print(upbitUtil.getWaitOrderList())
 
 # 코인 구입
 # upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=5000, headers=headers)
