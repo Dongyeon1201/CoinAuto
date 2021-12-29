@@ -259,7 +259,8 @@ while True:
             Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
 
             if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
-                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA30']:
+                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA30'] and \
+                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price']:
 
                 # 최소 주문 금액인 5000원 이상이 존재할 때
                 if current_krw < 5000:
