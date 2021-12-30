@@ -10,6 +10,7 @@ import schedule
 import json
 import asyncio
 import websockets   # 웹 소켓 모듈을 선언한다.
+import copy
 
 # 소수점 자르기 함수
 def truncate(num,n):

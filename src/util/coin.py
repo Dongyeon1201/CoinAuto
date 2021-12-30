@@ -86,14 +86,6 @@ class Coin:
     def setTodayOpeningprice(self, opening_price):
         self.opening_price = opening_price
 
-    # 30일 MA 재 설정
-    def setMA_30(self, MA_30):
-        self.MA_30 = MA_30
-
-    # 5일 MA 재 설정
-    def setMA_5(self, MA_5):
-        self.MA_5 = MA_5
-
     def setIsRise(self, isRise):
         self.isRise = isRise
 

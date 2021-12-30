@@ -21,12 +21,14 @@ def get_arguments():
     parser.add_argument('-d', '--down', required=False, default=1.5, help='목표가에서 얼마나 떨어지면 매도할지 퍼센트', dest='down')
     parser.add_argument('-f', '--firstdown', required=False, default=3, help='매수가에서 얼마나 떨어지면 매도할지 퍼센트', dest='firstdown')
     parser.add_argument('-b', '--buyrange', required=False, default=0.1, help='5일선이 30일선에 어느 범위 안에 있을때만 구매할 지 설정', dest='buyrange')
+    parser.add_argument('-m', '--minprice', required=False, default=150, help='거래할 최소 금액', dest='minprice')
    
     return_arg_data['percent'] = parser.parse_args().percent
     return_arg_data['want'] = parser.parse_args().want
     return_arg_data['down'] = parser.parse_args().down
     return_arg_data['firstdown'] = parser.parse_args().firstdown
     return_arg_data['buyrange'] = parser.parse_args().buyrange
+    return_arg_data['minprice'] = parser.parse_args().minprice
 
     return return_arg_data
 
@@ -36,60 +38,60 @@ INPUT_COIN_WANT = float(get_arguments()['want'])
 INPUT_COIN_DOWN = float(get_arguments()['down'])
 INPUT_COIN_FIRST_DOWN = float(get_arguments()['firstdown'])
 INPUT_COIN_BUYRANGE = float(get_arguments()['buyrange'])
+INPUT_COIN_MINPRICE = float(get_arguments()['minprice'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 CoinAccount = Account(upbitUtil.getAllCoinList())
 
 # 전체 코인 정보 초기 설정
-upbitUtil.setCoinInfo()
-
-#################### 60분봉 스케줄 모음 ####################
-
-# # 오늘 판매한 코인 목록 초기화
-# def dailyExec():
-#     CoinAccount.ResetTodaySellList()
-
-# # MA 재설정 함수(스케줄에 사용)
-# def everyhourExec():
-#     for CoinName in CoinAccount.watch_coin_list:
-#         upbitUtil.setMA(CoinName, 5, without_last=True)
-#         upbitUtil.setMA(CoinName, 30, without_last=True)
-#         upbitUtil.setBeforeMA(CoinName, 5)
-#         upbitUtil.setBeforeMA(CoinName, 30)
-#         time.sleep(0.5)
-
-# # 매일 0시에 각 MA 재 설정(15초 딜레이)
-# schedule.every().day.at("09:00:15").do(dailyExec)
-
-# # 매 시간 MA 초기화
-# schedule.every().hour.at(":00").do(everyhourExec)
-
-# everyhourExec()
-
-######################################################
+frame = {
+    "trade_price" : None,
+    "opening_price" : None,
+    "MA20" : None,
+    "MA5" : None
+}
+upbitUtil.setCoinInfo(frame)
 
 #################### 일봉 스케줄 모음 ####################
 
 # 오늘 판매한 코인 목록 초기화
-def dailyExec():
+def daliyExec():
     CoinAccount.ResetTodaySellList()
 
+# 코인 정보 설정
+def InfoExec():
     for CoinName in CoinAccount.watch_coin_list:
-        upbitUtil.setMA(CoinName, 5, without_last=True)
-        upbitUtil.setMA(CoinName, 30, without_last=True)
-        upbitUtil.setBeforeMA(CoinName, 5)
-        upbitUtil.setBeforeMA(CoinName, 30)
-        time.sleep(0.5)
 
+        # 정보 얻어오기
+        res = upbitUtil.GetCoinCandles(CoinName, days=False, mins=15)
+
+        if res == False:
+            continue
+
+        # 얻어온 정보를 사용하여 MA와 시가를 설정
+        upbitUtil.setMA(res, CoinName, 5, without_last=True)
+        upbitUtil.setMA(res, CoinName, 20, without_last=True)
+        upbitUtil.setBeforeMA(res, CoinName, 5)
+        upbitUtil.setBeforeMA(res, CoinName, 20)
+        upbitUtil.setOpeningprice(res, CoinName)
+
+        time.sleep(0.1)
+    
 ######################################################
 
-# 매일 0시에 각 MA 재 설정(15초 딜레이)
-schedule.every().day.at("09:00:15").do(dailyExec)
+# 매일 9시에 각 MA 재 설정(15초 딜레이)
+schedule.every().day.at("09:00:15").do(daliyExec)
 
-#################################################
+# 매 시간 MA 재 설정
+# schedule.every().hour.at(":00").do(everyhourExec)
+
+# 15분마다 코인의 정보 재 설정
+schedule.every(15).minutes.do(InfoExec)
 
 # 최초 시작 시 MA와 가격 설정 함수 동작
-dailyExec()
+InfoExec()
+
+#################################################
 
 asyncio.get_event_loop().run_until_complete(upbitUtil.websocket_connect(CoinAccount.watch_coin_list))
 
@@ -111,7 +113,7 @@ for CoinName in CoinAccount.watch_coin_list:
         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
         # 수익 실현 매수가 초기 설정
-        MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
+        MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
         # 손절 가격 초기 설정
         MYCOIN.setExitLinePrice(float(MYCOIN.buy_price) * (1 - (MYCOIN.first_down_line / 100)))
@@ -120,7 +122,6 @@ for CoinName in CoinAccount.watch_coin_list:
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
 
 ##################### 무한 반복 (5초마다 가격 확인 후 동작) ####################
-
 
 while True:
 
@@ -137,10 +138,11 @@ while True:
     # 투자 유의 코인 이름 목록
     warning_coins = upbitUtil.GetWarningcoin()
 
+    # 모든 코인 조회
     for CoinName in CoinAccount.watch_coin_list:
 
         # 상장된지 30일도 되지 않은 코인은 거래하지 않음
-        # 사전에 trade_able값을 None으로 처리
+        # 사전에 trade_able값을 False으로 처리
         if upbitUtil.coins_info[CoinName]['trade_able'] == False:
             continue
 
@@ -157,7 +159,7 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA30 : {}\n\tMA5 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA20 : {}\n\tMA5 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
@@ -166,7 +168,7 @@ while True:
                 (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
                 MYCOIN.return_line_price,
                 MYCOIN.exit_line_price,
-                upbitUtil.coins_info[CoinName]['MA30'],
+                upbitUtil.coins_info[CoinName]['MA20'],
                 upbitUtil.coins_info[CoinName]['MA5']
             ))
 
@@ -179,7 +181,7 @@ while True:
                 MYCOIN.setExitLinePrice(MYCOIN.return_line_price * (1 - (MYCOIN.down_line / 100)))
 
                 # 재 목표 가격을 (기존 목표가 * 목표 상승률)값으로 재 설정
-                MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + ((MYCOIN.coin_want_return * MYCOIN.jump_num + 1) / 100)))
+                MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + ((MYCOIN.coin_want_return * MYCOIN.jump_num + 1) / 100)))
 
                 # 로그 설정
                 logging.info("[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
@@ -248,22 +250,24 @@ while True:
 
         # 코인 미 보유 시(매수 조건 확인)
         else:
-
-            # 현재 가격이 30일선 넘을 때 [ 매수 ]
-            # 시가가 30일선 밑 일때
-            # if  upbitUtil.coins_info[CoinName]['trade_price'] > upbitUtil.coins_info[CoinName]['MA30'] and \
-            #     upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['MA30'] and \
-            #     upbitUtil.coins_info[CoinName]['MA30'] > upbitUtil.coins_info[CoinName]['MA5']:
-
-            Current_MA30 = ((upbitUtil.coins_info[CoinName]['MA30'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
+            
+            # 현재 이동 평균선
+            # Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
+            # Current_MA20 = ((upbitUtil.coins_info[CoinName]['MA20'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
             Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
+            Current_MA20 = ((upbitUtil.coins_info[CoinName]['MA20'] * 19) + upbitUtil.coins_info[CoinName]['trade_price']) / 20                
 
-            if Current_MA5 > Current_MA30 and Current_MA5 < Current_MA30 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
-                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA30'] and \
+            # 매수 조건에 만족할 때
+            if Current_MA5 > Current_MA20 and Current_MA5 < Current_MA20 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
+                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA20'] and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price']:
 
-                # 최소 주문 금액인 5000원 이상이 존재할 때
+                # 최소 주문 금액인 5000원 이상이 존재할 때만
                 if current_krw < 5000:
+                    continue
+
+                # 현재 가격이 INPUT_COIN_MINPRICE 이상일때만 조회
+                if upbitUtil.coins_info[CoinName]['trade_price'] < INPUT_COIN_MINPRICE:
                     continue
 
                 time.sleep(0.5)
@@ -298,7 +302,7 @@ while True:
                     MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
 
                     # 수익 실현 매수가 초기 설정
-                    MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA30'] * (1 + (MYCOIN.coin_want_return / 100)))
+                    MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
                     # 손절 가격 초기 설정
                     MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))

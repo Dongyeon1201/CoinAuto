@@ -115,28 +115,6 @@ class UpbitUtil:
             #     data = json.loads(data.decode('utf-8'))
             #     return data['trade_price']
 
-    # MarketName을 사용하여 해당 코인의 당일 시가 반환
-    def getTodayOpeningprice(self, market_name):
-
-        param = {
-            "count": 1,
-            "market" : market_name
-        }
-
-        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
-        
-        if res.status_code == 200:
-            return res.json().pop()['opening_price']
-
-        else:
-            logging.error("[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}".format(res.status_code))
-            
-            if res.text == None:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```NONE```".format(res.status_code))
-            else:
-                SendSlackMessage(ERROR_MESSAGE + "[ Function Name : getCurrentPrice() ]\n[+] 현재 가격을 확인할 수 없습니다. STATUS CODE : {}\n[ ERROR ] ```{}```".format(res.status_code, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
-
     # MarketName을 이용하여 해당 코인의 미 체결 주문 목록을 반환
     def getWaitOrderList(self, market_name):
         query = {
@@ -423,79 +401,84 @@ class UpbitUtil:
         return res.json()[0]['change']
 
     # 코인의 초기 상태 설정
-    def setCoinInfo(self):
-
+    def setCoinInfo(self, frame):
         for CoinName in self.getAllCoinList():
-
-            self.coins_info[CoinName] = {
-                "trade_price" : None,
-                "opening_price" : None,
-                "MA30" : None,
-                "MA5" : None
-            }
+            self.coins_info[CoinName] = copy.deepcopy(frame)
 
     # MA 구하기
     # without_last : 가장 최근 캔들에 대한 정보를 제외한 MA를 구해준다.
     # 30개 요청 후 without_last True로 실행 시 -> 가장 최근 캔들을 제외한 29개의 MA가 반환
-    def setMA(self, market_name, count, without_last=False):
+    def setMA(self, res, market_name, count, without_last=False):
 
         MA = 0
 
-        param = {
-            "count": count,
-            "market" : market_name
-        }
+        # param = {
+        #     "count": count,
+        #     "market" : market_name
+        # }
 
-        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        # # 이동 평균선(일 단위)
+        # if days:
+        #     res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
         
-        array = res.json()
-
-        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
-        if len(array) < count:
+        # # 이동 평균선(분 단위)
+        # else:
+        #     res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(mins), headers=self.getHeaders(), params=param)
+        
+        # 요청한 count보다 적은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(res.json()) < count:
             self.coins_info[market_name]['trade_able'] = False
-        
+            return
+
+        if without_last: 
+            array = res.json()[1:count]
         else:
-            if without_last: 
-                del array[0]
+            array = res.json()[:count]
+        
+        for item in array:
+            MA += item['trade_price']
+                
+        if without_last:
+            self.coins_info[market_name]['MA{}'.format(count)] = MA / (count-1)
+        else:
+            self.coins_info[market_name]['MA{}'.format(count)] = MA / count
 
-            for item in array:
-                MA += item['trade_price']
+        self.coins_info[market_name]['trade_able'] = True
 
-            if without_last:
-                self.coins_info[market_name]['MA{}'.format(count)] = MA / (count-1)
-            else:
-                self.coins_info[market_name]['MA{}'.format(count)] = MA / count
-
-            self.coins_info[market_name]['trade_able'] = True
-
-    # 현재를 제외한 count 갯수의 캔들에 대한 정보를 얻어온다.
-    def setBeforeMA(self, market_name, count):
+    # 현재 캔들 바로 직전의 MA를 구한다.
+    def setBeforeMA(self, res, market_name, count):
 
         MA = 0
 
-        param = {
-            "count": count+1,
-            "market" : market_name
-        }
+        # param = {
+        #     "count": count+1,
+        #     "market" : market_name
+        # }
 
-        res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        # res = requests.get(self.server_url + "/v1/candles/minutes/60", headers=self.getHeaders(), params=param)
+        # # 이동 평균선(일 단위)
+        # if days:
+        #     res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
         
-        array = res.json()
-
-        # 상장된지 30일(60분봉일땐 시간)도 되지 않은 코인은 MA를 None으로 처리, 거래를 하지 않음
-        if len(array) < count:
+        # # 이동 평균선(분 단위)
+        # else:
+        #     res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(mins), headers=self.getHeaders(), params=param)
+        
+        # 요청한 count보다 적은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(res.json()) < count:
             self.coins_info[market_name]['trade_able'] = False
+            return
+
+        array = res.json()[1:count+1]
         
-        else:
-            del array[0]
+        for item in array:
+            MA += item['trade_price']
 
-            for item in array:
-                MA += item['trade_price']
+        self.coins_info[market_name]['Before_MA{}'.format(count)] = MA / count
+        self.coins_info[market_name]['trade_able'] = True
 
-            self.coins_info[market_name]['Before_MA{}'.format(count)] = MA / count
-            self.coins_info[market_name]['trade_able'] = True
+    # MarketName을 사용하여 해당 코인의 당일 시가 반환
+    def setOpeningprice(self, res, market_name):
+        self.coins_info[market_name]['opening_price'] = res.json()[0]['opening_price']
 
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):
@@ -537,3 +520,23 @@ class UpbitUtil:
 
                 except websockets.ConnectionClosed:
                     break
+    
+    # 캔들 정보 얻어오기
+    def GetCoinCandles(self, market_name, count=200, days=True, mins=60):
+
+        param = {
+            "count": count,
+            "market" : market_name
+        }
+
+        if days:
+            res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
+        else:
+            res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(mins), headers=self.getHeaders(), params=param)
+
+        if res.status_code == 200:
+            return res
+        else:
+            logging.error("[ Function Name : GetCoinCandles() ]\n[+] {} 코인의 캔들 조회를 실패하였습니다.\n[-] ERROR : {}".format(market_name, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            SendSlackMessage(ERROR_MESSAGE + "[ Function Name : GetCoinCandles() ]\n[+] {} 코인의 캔들 조회를 실패하였습니다.\n[-] ERROR : {}".format(market_name, json.dumps(json.loads(res.text),indent=4, sort_keys=True)))
+            return False
