@@ -263,16 +263,8 @@ while True:
                 # 매수 조건에 만족할 때
                 if Current_MA5 > Current_MA20 and Current_MA5 < Current_MA20 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
                 upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA20'] and \
-                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price']:
-
-                    # 최소 주문 금액인 5000원 이상이 존재할 때만
-                    if current_krw < 5000:
-                        continue
-
-                    time.sleep(0.5)
-
-                    # 매수 가능한 현금 확인
-                    current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price'] and \
+                current_krw > 5000:
                     
                     # 매수 가능한 수량 확인 [지정가 매수에 사용]
                     # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
@@ -280,49 +272,51 @@ while True:
                     # 매수 가능한 수량이 있을 때
                     # if orderable_volume > 0:
 
-                    if current_krw > 5000:
+                    # 주문을 위한 헤더 설정
+                    headers = upbitUtil.getHeaders(query={'market': CoinName})
 
-                        # 주문을 위한 헤더 설정
-                        headers = upbitUtil.getHeaders(query={'market': CoinName})
+                    # 코인 구입 [시장가 매수]
+                    upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=current_krw, headers=headers)
 
-                        # 코인 구입 [시장가 매수]
-                        upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=current_krw, headers=headers)
+                    # 코인 구입 [지정가 매수]
+                    # upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
 
-                        # 코인 구입 [지정가 매수]
-                        # upbitUtil.orderCoin(CoinName, BUY, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
+                    # 코인 추가
+                    MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN, INPUT_COIN_FIRST_DOWN)
 
-                        # 코인 추가
-                        MYCOIN = Coin(CoinName, INPUT_COIN_PROPORTION, INPUT_COIN_WANT, INPUT_COIN_DOWN, INPUT_COIN_FIRST_DOWN)
+                    # 보유 코인 목록 추가
+                    CoinAccount.AddCoin(MYCOIN)
 
-                        # 보유 코인 목록 추가
-                        CoinAccount.AddCoin(MYCOIN)
+                    # 구입 가격 설정
+                    MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
 
-                        # 구입 가격 설정
-                        MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
+                    # 수익 실현 매수가 초기 설정
+                    MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
-                        # 수익 실현 매수가 초기 설정
-                        MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
+                    # 손절 가격 초기 설정
+                    MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))
 
-                        # 손절 가격 초기 설정
-                        MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))
+                    # 로그 설정
+                    logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                        MYCOIN.market_name, 
+                        MYCOIN.jump_num + 1, 
+                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+                        MYCOIN.return_line_price,
+                        MYCOIN.exit_line_price
+                    ))
 
-                        # 로그 설정
-                        logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
-                            MYCOIN.market_name, 
-                            MYCOIN.jump_num + 1, 
-                            (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                            MYCOIN.return_line_price,
-                            MYCOIN.exit_line_price
-                        ))
+                    # SLACK 설정
+                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                        MYCOIN.market_name, 
+                        MYCOIN.jump_num + 1, 
+                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+                        MYCOIN.return_line_price,
+                        MYCOIN.exit_line_price
+                    ))
 
-                        # SLACK 설정
-                        SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
-                            MYCOIN.market_name, 
-                            MYCOIN.jump_num + 1, 
-                            (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                            MYCOIN.return_line_price,
-                            MYCOIN.exit_line_price
-                        ))
+                    # 매수 가능한 현금 확인
+                    current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+
         
     ########## 1회 작업이 끝난 후 ##########
 
