@@ -245,7 +245,7 @@ while True:
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
 
-                    time.sleep(0.5)
+                    time.sleep(0.1)
 
                     # 매수 가능한 현금량 갱신
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
@@ -315,8 +315,6 @@ while True:
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
-
-                    time.sleep(0.5)
 
                     # 매수 가능한 현금 확인
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)

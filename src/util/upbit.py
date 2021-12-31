@@ -303,11 +303,12 @@ class UpbitUtil:
             query['ord_type'] = 'price'
 
             # 총 주문 금액을 설정
-            query['price'] = order_krw * (1-(0.05))
+            query['price'] = order_krw * (1-BID_FEE_KRW)
 
             # 주문 요청을 위한 헤더 생성
             headers = self.getHeaders(query=query)
-            print(query)
+
+            # 주문 요청
             res = requests.post(self.server_url + "/v1/orders", params=query, headers=headers)
 
             if res.status_code == 201:
