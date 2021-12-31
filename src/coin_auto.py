@@ -217,8 +217,6 @@ while True:
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
-                    print("current krw : {}".format(current_krw), flush=True)
-
                     # 코인 판매 [시장가 매도]
                     upbitUtil.orderMarketCoin(CoinName, SELL, orderable_volume=orderable_volume, headers=headers)
 
@@ -278,8 +276,6 @@ while True:
 
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': CoinName})
-
-                    print("current krw : {}".format(current_krw), flush=True)
 
                     # 코인 구입 [시장가 매수]
                     upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=current_krw, headers=headers)
