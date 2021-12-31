@@ -217,6 +217,8 @@ while True:
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': MYCOIN.market_name})
 
+                    print("current krw : {}".format(current_krw), flush=True)
+
                     # 코인 판매 [시장가 매도]
                     upbitUtil.orderMarketCoin(CoinName, SELL, orderable_volume=orderable_volume, headers=headers)
 
@@ -245,6 +247,8 @@ while True:
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
 
+                    time.sleep(0.5)
+
                     # 매수 가능한 현금량 갱신
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
 
@@ -266,11 +270,6 @@ while True:
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price'] and \
                 current_krw > 5000:
                     
-                    # 매수 가능한 현금 확인
-                    current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
-
-                    time.sleep(0.5)
-
                     # 매수 가능한 수량 확인 [지정가 매수에 사용]
                     # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
@@ -279,6 +278,8 @@ while True:
 
                     # 주문을 위한 헤더 설정
                     headers = upbitUtil.getHeaders(query={'market': CoinName})
+
+                    print("current krw : {}".format(current_krw), flush=True)
 
                     # 코인 구입 [시장가 매수]
                     upbitUtil.orderMarketCoin(CoinName, BUY, order_krw=current_krw, headers=headers)
@@ -318,6 +319,8 @@ while True:
                         MYCOIN.return_line_price,
                         MYCOIN.exit_line_price
                     ))
+
+                    time.sleep(0.5)
 
                     # 매수 가능한 현금 확인
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
