@@ -264,7 +264,7 @@ while True:
                 if Current_MA5 > Current_MA20 and Current_MA5 < Current_MA20 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
                 upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA20'] and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price'] and \
-                current_krw > 5000:
+                current_krw > 10000:
                     
                     # 매수 가능한 수량 확인 [지정가 매수에 사용]
                     # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
