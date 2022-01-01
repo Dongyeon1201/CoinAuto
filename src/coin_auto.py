@@ -116,6 +116,9 @@ for CoinName in CoinAccount.watch_coin_list:
         # 평균 매수가 재 설정
         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
+        # 최고 가격 초기 설정
+        MYCOIN.SetHighPrice(MYCOIN.buy_price)
+
         # 수익 실현 매수가 초기 설정
         # MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
