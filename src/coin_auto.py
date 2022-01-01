@@ -72,11 +72,12 @@ def InfoExec():
         # upbitUtil.setMA(res, CoinName, 20, without_last=True)
         # upbitUtil.setBeforeMA(res, CoinName, 5)
         # upbitUtil.setBeforeMA(res, CoinName, 20)
-        print("{} : {}".format(CoinName,res.json()[0]['opening_price']), flush=True)
-        upbitUtil.setOpeningprice(res.json()[0]['opening_price'], CoinName)
-
         time.sleep(0.1)
-    
+
+        opening_price = res.json()[0]['opening_price']
+        upbitUtil.setOpeningprice(opening_price=opening_price, market_name=CoinName)
+        print("{} : {}".format(CoinName, upbitUtil.coins_info[CoinName]['opening_price']))
+
 ######################################################
 
 # 매일 9시에 각 MA 재 설정(15초 딜레이)
