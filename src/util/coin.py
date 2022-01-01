@@ -91,3 +91,6 @@ class Coin:
 
     def upJumpNum(self):
         self.jump_num += 1
+
+    def SetHighPrice(self, high_price):
+        self.high_price = high_price

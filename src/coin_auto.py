@@ -47,8 +47,7 @@ CoinAccount = Account(upbitUtil.getAllCoinList())
 frame = {
     "trade_price" : None,
     "opening_price" : None,
-    "MA20" : None,
-    "MA5" : None
+    "MA60" : None
 }
 upbitUtil.setCoinInfo(frame)
 
@@ -63,16 +62,16 @@ def InfoExec():
     for CoinName in CoinAccount.watch_coin_list:
 
         # 정보 얻어오기
-        res = upbitUtil.GetCoinCandles(CoinName, days=False, mins=15)
+        res = upbitUtil.GetCoinCandles(CoinName, days=False, mins=240)
 
         if res == False:
             continue
 
         # 얻어온 정보를 사용하여 MA와 시가를 설정
-        upbitUtil.setMA(res, CoinName, 5, without_last=True)
-        upbitUtil.setMA(res, CoinName, 20, without_last=True)
-        upbitUtil.setBeforeMA(res, CoinName, 5)
-        upbitUtil.setBeforeMA(res, CoinName, 20)
+        upbitUtil.setMA(res, CoinName, 60, without_last=True)
+        # upbitUtil.setMA(res, CoinName, 20, without_last=True)
+        # upbitUtil.setBeforeMA(res, CoinName, 5)
+        # upbitUtil.setBeforeMA(res, CoinName, 20)
         upbitUtil.setOpeningprice(res, CoinName)
 
         time.sleep(0.1)
@@ -80,13 +79,18 @@ def InfoExec():
 ######################################################
 
 # 매일 9시에 각 MA 재 설정(15초 딜레이)
-schedule.every().day.at("09:00:15").do(daliyExec)
+# schedule.every().day.at("09:00:15").do(daliyExec)
 
 # 매 시간 MA 재 설정
 # schedule.every().hour.at(":00").do(everyhourExec)
 
-# 15분마다 코인의 정보 재 설정
-schedule.every(15).minutes.do(InfoExec)
+# 4시간마다 코인의 정보 재 설정
+schedule.every().day.at("9:00:03").do(InfoExec)
+schedule.every().day.at("13:00:03").do(InfoExec)
+schedule.every().day.at("17:00:03").do(InfoExec)
+schedule.every().day.at("21:00:03").do(InfoExec)
+schedule.every().day.at("01:00:03").do(InfoExec)
+schedule.every().day.at("05:00:03").do(InfoExec)
 
 # 최초 시작 시 MA와 가격 설정 함수 동작
 InfoExec()
@@ -113,10 +117,10 @@ for CoinName in CoinAccount.watch_coin_list:
         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
         # 수익 실현 매수가 초기 설정
-        MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
+        # MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
         # 손절 가격 초기 설정
-        MYCOIN.setExitLinePrice(float(MYCOIN.buy_price) * (1 - (MYCOIN.first_down_line / 100)))
+        # MYCOIN.setExitLinePrice(float(MYCOIN.buy_price) * (1 - (MYCOIN.first_down_line / 100)))
 
 # 시작 메세지 전송
 SendSlackMessage(INFO_MESSAGE + "[+] 코인 자동 매매 시작")
@@ -141,14 +145,13 @@ while True:
     # 모든 코인 조회
     for CoinName in CoinAccount.watch_coin_list:
 
-        # 상장된지 30일도 되지 않은 코인은 거래하지 않음
-        # 사전에 trade_able값을 False으로 처리
+        # 사전에 trade_able값을 False으로 처리된 코인은 거래하지 않음
         if upbitUtil.coins_info[CoinName]['trade_able'] == False:
             continue
 
         # 오늘 이미 판매한 코인들은 당일엔 더 이상 매수 / 매도를 하지 않음
-        if CoinName in CoinAccount.today_sell_coin_list:
-            continue
+        # if CoinName in CoinAccount.today_sell_coin_list:
+        #     continue
 
         # 코인 보유 시(매도 조건 확인)
         if CoinName in hold_coins:
@@ -159,54 +162,83 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA20 : {}\n\tMA5 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\tMA60 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
                 MYCOIN.buy_price,
-                MYCOIN.jump_num + 1,
-                (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                MYCOIN.return_line_price,
-                MYCOIN.exit_line_price,
-                upbitUtil.coins_info[CoinName]['MA20'],
-                upbitUtil.coins_info[CoinName]['MA5']
+                upbitUtil.coins_info[CoinName]['MA60']
             ))
 
+            # logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA20 : {}\n\tMA5 : {}"
+            # .format(
+            #     MYCOIN.market_name, 
+            #     upbitUtil.coins_info[CoinName]['trade_price'],
+            #     MYCOIN.buy_price,
+            #     MYCOIN.jump_num + 1,
+            #     (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+            #     MYCOIN.return_line_price,
+            #     MYCOIN.exit_line_price,
+            #     upbitUtil.coins_info[CoinName]['MA20'],
+            #     upbitUtil.coins_info[CoinName]['MA5']
+            # ))
+
             # 수익률 만족 => 목표 가격 & 손절 가격 재설정
-            if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price:
+            # if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.return_line_price:
                 
-                MYCOIN.upJumpNum()
+            #     MYCOIN.upJumpNum()
 
-                # 손절 가격을 기존 목표가로 설정
-                MYCOIN.setExitLinePrice(MYCOIN.return_line_price * (1 - (MYCOIN.down_line / 100)))
+            #     # 손절 가격을 기존 목표가로 설정
+            #     MYCOIN.setExitLinePrice(MYCOIN.return_line_price * (1 - (MYCOIN.down_line / 100)))
 
-                # 재 목표 가격을 (기존 목표가 * 목표 상승률)값으로 재 설정
-                MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + ((MYCOIN.coin_want_return * MYCOIN.jump_num + 1) / 100)))
+            #     # 재 목표 가격을 (기존 목표가 * 목표 상승률)값으로 재 설정
+            #     MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + ((MYCOIN.coin_want_return * MYCOIN.jump_num + 1) / 100)))
+
+            #     # 로그 설정
+            #     logging.info("[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+            #         MYCOIN.market_name, 
+            #         MYCOIN.jump_num, 
+            #         MYCOIN.jump_num * MYCOIN.coin_want_return,
+            #         MYCOIN.jump_num + 1,
+            #         (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+            #         MYCOIN.return_line_price,
+            #         MYCOIN.exit_line_price
+            #     ))
+
+            #     # 슬랙으로 전달
+            #     SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+            #         MYCOIN.market_name, 
+            #         MYCOIN.jump_num, 
+            #         MYCOIN.jump_num * MYCOIN.coin_want_return,
+            #         MYCOIN.jump_num + 1,
+            #         (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+            #         MYCOIN.return_line_price,
+            #         MYCOIN.exit_line_price
+            #     ))
+            
+            # 최고가 갱신 시 최고가 재 설정
+            if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.high_price:
+
+                MYCOIN.SetHighPrice(upbitUtil.coins_info[CoinName]['trade_price'])
 
                 # 로그 설정
-                logging.info("[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                logging.info("[+] {} 코인 최고가 달성!(+{}%) : {}".format(
                     MYCOIN.market_name, 
-                    MYCOIN.jump_num, 
-                    MYCOIN.jump_num * MYCOIN.coin_want_return,
-                    MYCOIN.jump_num + 1,
-                    (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                    MYCOIN.return_line_price,
-                    MYCOIN.exit_line_price
+                    float(MYCOIN.high_price - MYCOIN.buy_price) / MYCOIN.buy_price * 100,
+                    MYCOIN.high_price
                 ))
 
-                # 슬랙으로 전달
-                SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {}차 목표가 달성!(+{}%)\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
-                    MYCOIN.market_name, 
-                    MYCOIN.jump_num, 
-                    MYCOIN.jump_num * MYCOIN.coin_want_return,
-                    MYCOIN.jump_num + 1,
-                    (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                    MYCOIN.return_line_price,
-                    MYCOIN.exit_line_price
-                ))
-            
+                # # 슬랙으로 전달
+                # SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 최고가 달성!(+{}%) : {}".format(
+                #     MYCOIN.market_name, 
+                #     float(MYCOIN.high_price - MYCOIN.buy_price) / MYCOIN.buy_price * 100,
+                #     MYCOIN.high_price
+                # ))
+
             # 손절 가격 도달 시 매도
-            elif upbitUtil.coins_info[CoinName]['trade_price'] < MYCOIN.exit_line_price:
+            if (upbitUtil.coins_info[CoinName]['opening_price'] > upbitUtil.coins_info[CoinName]['MA60'] and \
+                upbitUtil.coins_info[CoinName]['trade_price'] < upbitUtil.coins_info[CoinName]['MA60']) or \
+                upbitUtil.coins_info[CoinName]['trade_price'] < MYCOIN.high_price * float(1-(INPUT_COIN_DOWN/100)):
                 
                 # 매도 가능한 수량 확인
                 orderable_volume = upbitUtil.getCanSellVolume(MYCOIN.market_name)
@@ -227,20 +259,33 @@ while True:
                     CoinAccount.AddTodaySellList(MYCOIN.market_name)
 
                     # 로그 설정
-                    logging.info("[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                    logging.info("[+] {} 코인 {} 가격에 매도\n\t대략 {}% 변화".format(
                         MYCOIN.market_name,
                         upbitUtil.coins_info[CoinName]['trade_price'],
-                        MYCOIN.jump_num, 
-                        MYCOIN.jump_num * MYCOIN.coin_want_return
+                        float(upbitUtil.coins_info[CoinName]['trade_price'] - MYCOIN.buy_price) / MYCOIN.buy_price * 100
                     ))
 
                     # 슬랙으로 전달
-                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {} 가격에 매도\n\t대략 {}% 변화".format(
                         MYCOIN.market_name,
                         upbitUtil.coins_info[CoinName]['trade_price'],
-                        MYCOIN.jump_num, 
-                        MYCOIN.jump_num * MYCOIN.coin_want_return
+                        float(upbitUtil.coins_info[CoinName]['trade_price'] - MYCOIN.buy_price) / MYCOIN.buy_price * 100
                     ))
+                    # # 로그 설정
+                    # logging.info("[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                    #     MYCOIN.market_name,
+                    #     upbitUtil.coins_info[CoinName]['trade_price'],
+                    #     MYCOIN.jump_num, 
+                    #     MYCOIN.jump_num * MYCOIN.coin_want_return
+                    # ))
+
+                    # # 슬랙으로 전달
+                    # SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 {} 가격에 매도\n\t목표가 총 {}번 달성!(+{}%)".format(
+                    #     MYCOIN.market_name,
+                    #     upbitUtil.coins_info[CoinName]['trade_price'],
+                    #     MYCOIN.jump_num, 
+                    #     MYCOIN.jump_num * MYCOIN.coin_want_return
+                    # ))
 
                     # 보유 코인 목록 삭제
                     CoinAccount.DelCoin(MYCOIN)
@@ -258,15 +303,19 @@ while True:
 
                 # 현재 이동 평균선
                 # Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
-                # Current_MA20 = ((upbitUtil.coins_info[CoinName]['MA20'] * 29) + upbitUtil.coins_info[CoinName]['trade_price']) / 30
-                Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5
-                Current_MA20 = ((upbitUtil.coins_info[CoinName]['MA20'] * 19) + upbitUtil.coins_info[CoinName]['trade_price']) / 20                
+                # Current_MA20 = ((upbitUtil.coins_info[CoinName]['MA20'] * 19) + upbitUtil.coins_info[CoinName]['trade_price']) / 20                
+                Current_MA60 = ((upbitUtil.coins_info[CoinName]['MA60'] * 59) + upbitUtil.coins_info[CoinName]['trade_price']) / 60                
 
                 # 매수 조건에 만족할 때
-                if Current_MA5 > Current_MA20 and Current_MA5 < Current_MA20 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
-                upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA20'] and \
-                upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price'] and \
+                if upbitUtil.coins_info[CoinName]['trade_price'] < Current_MA60 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
+                upbitUtil.coins_info[CoinName]['trade_price'] > Current_MA60 and \
+                upbitUtil.coins_info[CoinName]['opening_price'] < Current_MA60 and \
                 current_krw > 5000:
+
+                    # if Current_MA5 > Current_MA20 and Current_MA5 < Current_MA20 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
+                    # upbitUtil.coins_info[CoinName]['Before_MA5'] < upbitUtil.coins_info[CoinName]['Before_MA20'] and \
+                    # upbitUtil.coins_info[CoinName]['opening_price'] < upbitUtil.coins_info[CoinName]['trade_price'] and \
+                    # current_krw > 5000:
                     
                     # 매수 가능한 수량 확인 [지정가 매수에 사용]
                     # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
@@ -292,11 +341,14 @@ while True:
                     # 구입 가격 설정
                     MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
 
+                    # 최고 가격 초기 설정
+                    MYCOIN.SetHighPrice(MYCOIN.buy_price)
+
                     # 수익 실현 매수가 초기 설정
-                    MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
+                    # MYCOIN.setReturnLinePrice(upbitUtil.coins_info[CoinName]['MA20'] * (1 + (MYCOIN.coin_want_return / 100)))
 
                     # 손절 가격 초기 설정
-                    MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))
+                    # MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))
 
                     # 로그 설정
                     logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
