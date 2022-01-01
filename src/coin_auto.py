@@ -64,6 +64,8 @@ def InfoExec():
         # 정보 얻어오기
         res = upbitUtil.GetCoinCandles(CoinName, days=False, mins=240)
 
+        print(res.json[0])
+
         if res == False:
             continue
 
