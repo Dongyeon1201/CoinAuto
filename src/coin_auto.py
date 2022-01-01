@@ -85,7 +85,7 @@ def InfoExec():
 # schedule.every().hour.at(":00").do(everyhourExec)
 
 # 4시간마다 코인의 정보 재 설정
-schedule.every().day.at("9:00:03").do(InfoExec)
+schedule.every().day.at("09:00:03").do(InfoExec)
 schedule.every().day.at("13:00:03").do(InfoExec)
 schedule.every().day.at("17:00:03").do(InfoExec)
 schedule.every().day.at("21:00:03").do(InfoExec)
