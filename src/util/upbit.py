@@ -529,7 +529,7 @@ class UpbitUtil:
                     data = json.loads(data.decode('utf-8'))
 
                     self.coins_info[data['code']]['trade_price'] = data['trade_price']
-                    self.coins_info[data['code']]['opening_price'] = data['opening_price']
+                    # self.coins_info[data['code']]['opening_price'] = data['opening_price']
 
                 except websockets.ConnectionClosed:
                     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")

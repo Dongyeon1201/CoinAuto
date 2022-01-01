@@ -76,7 +76,6 @@ def InfoExec():
 
         opening_price = res.json()[0]['opening_price']
         upbitUtil.setOpeningprice(opening_price=opening_price, market_name=CoinName)
-        print("{} : {}".format(CoinName, upbitUtil.coins_info[CoinName]['opening_price']),flush=True)
 
 ######################################################
 
