@@ -490,8 +490,8 @@ class UpbitUtil:
         self.coins_info[market_name]['trade_able'] = True
 
     # MarketName을 사용하여 해당 코인의 당일 시가 반환
-    def setOpeningprice(self, res, market_name):
-        self.coins_info[market_name]['opening_price'] = res.json()[0]['opening_price']
+    def setOpeningprice(self, opening_price, market_name):
+        self.coins_info[market_name]['opening_price'] = opening_price
 
     # 일봉(당일 포함) 3일 연속 양봉인지 확인
     def isRise(self, market_name):

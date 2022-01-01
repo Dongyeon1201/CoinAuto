@@ -72,7 +72,8 @@ def InfoExec():
         # upbitUtil.setMA(res, CoinName, 20, without_last=True)
         # upbitUtil.setBeforeMA(res, CoinName, 5)
         # upbitUtil.setBeforeMA(res, CoinName, 20)
-        upbitUtil.setOpeningprice(res, CoinName)
+        print("{} : {}".format(CoinName,res.json()[0]['opening_price']), flush=True)
+        upbitUtil.setOpeningprice(res.json()[0]['opening_price'], CoinName)
 
         time.sleep(0.1)
     
