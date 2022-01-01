@@ -242,7 +242,7 @@ while True:
                 # ))
 
             # 손절 가격 도달 시 매도
-            if (upbitUtil.coins_info[CoinName]['opening_price'] > upbitUtil.coins_info[CoinName]['MA60'] and \
+            if (upbitUtil.coins_info[CoinName]['opening_price'] > upbitUtil.coins_info[CoinName]['trade_price'] and \
                 upbitUtil.coins_info[CoinName]['trade_price'] < upbitUtil.coins_info[CoinName]['MA60']) or \
                 upbitUtil.coins_info[CoinName]['trade_price'] < MYCOIN.high_price * float(1-(INPUT_COIN_DOWN/100)):
                 
