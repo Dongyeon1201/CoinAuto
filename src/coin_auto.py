@@ -351,22 +351,32 @@ while True:
                     # MYCOIN.setExitLinePrice(upbitUtil.coins_info[CoinName]['trade_price'] * (1 - (MYCOIN.first_down_line / 100)))
 
                     # 로그 설정
-                    logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
-                        MYCOIN.market_name, 
-                        MYCOIN.jump_num + 1, 
-                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                        MYCOIN.return_line_price,
-                        MYCOIN.exit_line_price
+                    logging.info("[+] {} 코인 매수 완료".format(
+                        MYCOIN.market_name
                     ))
 
                     # SLACK 설정
-                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
-                        MYCOIN.market_name, 
-                        MYCOIN.jump_num + 1, 
-                        (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
-                        MYCOIN.return_line_price,
-                        MYCOIN.exit_line_price
+                    SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료".format(
+                        MYCOIN.market_name
                     ))
+                    
+                    # # 로그 설정
+                    # logging.info("[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                    #     MYCOIN.market_name, 
+                    #     MYCOIN.jump_num + 1, 
+                    #     (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+                    #     MYCOIN.return_line_price,
+                    #     MYCOIN.exit_line_price
+                    # ))
+
+                    # # SLACK 설정
+                    # SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료\n\t{}차 목표가(+{}%) : {} / 손절가 : {}".format(
+                    #     MYCOIN.market_name, 
+                    #     MYCOIN.jump_num + 1, 
+                    #     (MYCOIN.jump_num + 1) * MYCOIN.coin_want_return,
+                    #     MYCOIN.return_line_price,
+                    #     MYCOIN.exit_line_price
+                    # ))
 
                     # 매수 가능한 현금 확인
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
