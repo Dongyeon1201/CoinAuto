@@ -97,16 +97,18 @@ class UpbitUtil:
         
             # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
             for item in market_items:
-                
+
                 try:
                     data = await websocket.recv()
                     data = json.loads(data.decode('utf-8'))
                     current_price_info[item] = data['trade_price']
 
                 except websockets.ConnectionClosed:
+                    current_price_info[item] = 0
                     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
 
                 except TimeoutError as e:
+                    current_price_info[item] = 0
                     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
 
             
