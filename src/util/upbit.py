@@ -505,7 +505,7 @@ class UpbitUtil:
     async def websocket_connect(self, market_items):
 
         # 웹 소켓에 접속을 합니다.
-        async with websockets.connect(WEBSOCKET_URL) as websocket:        
+        async with websockets.connect(WEBSOCKET_URL, ping_interval=60) as websocket:        
 
             send_data = str([{"ticket":"GetPrice"},{"type":"ticker","isOnlySnapshot":True,"codes": market_items}])
             await websocket.send(send_data)
@@ -521,7 +521,10 @@ class UpbitUtil:
                     self.coins_info[data['code']]['opening_price'] = data['opening_price']
 
                 except websockets.ConnectionClosed:
-                    break
+                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
+
+                except TimeoutError as e:
+                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
     
     # 캔들 정보 얻어오기
     def GetCoinCandles(self, market_name, count=200, days=True, mins=60):
