@@ -64,9 +64,6 @@ def InfoExec():
         # 정보 얻어오기
         res = upbitUtil.GetCoinCandles(CoinName, days=False, mins=240)
 
-        if CoinName == "KRW-CVC":
-            print(res.json()[0])
-
         if res == False:
             continue
 
@@ -76,6 +73,8 @@ def InfoExec():
         # upbitUtil.setBeforeMA(res, CoinName, 5)
         # upbitUtil.setBeforeMA(res, CoinName, 20)
         upbitUtil.setOpeningprice(res, CoinName)
+
+        print(CoinName, upbitUtil.coins_info[CoinName]['opening_price'], flush=True)
 
         time.sleep(0.1)
     
