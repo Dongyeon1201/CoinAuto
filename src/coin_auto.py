@@ -165,12 +165,14 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\tMA60 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\tMA60 : {}\n\t최고가 : {}\n\t현재 캔들 시가 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
                 MYCOIN.buy_price,
-                upbitUtil.coins_info[CoinName]['MA60']
+                upbitUtil.coins_info[CoinName]['MA60'],
+                MYCOIN.high_price,
+                upbitUtil.coins_info[CoinName]['opening_price']
             ))
 
             # logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\t{}차 목표가(+{}%) : {}\n\t손절 가격 : {}\n\tMA20 : {}\n\tMA5 : {}"
