@@ -90,16 +90,25 @@ class UpbitUtil:
         current_price_info = {}
 
         # 웹 소켓에 접속을 합니다.
-        async with websockets.connect(WEBSOCKET_URL) as websocket:        
+        async with websockets.connect(WEBSOCKET_URL, ping_interval=60) as websocket:        
 
             send_data = str([{"ticket":"CurrentPrice"},{"type":"ticker","isOnlySnapshot":True,"codes": market_items}])
             await websocket.send(send_data)
         
             # 웹 소켓 서버로 부터 메시지가 오면 콘솔에 출력합니다.
             for item in market_items:
-                data = await websocket.recv()
-                data = json.loads(data.decode('utf-8'))
-                current_price_info[item] = data['trade_price']
+                
+                try:
+                    data = await websocket.recv()
+                    data = json.loads(data.decode('utf-8'))
+                    current_price_info[item] = data['trade_price']
+
+                except websockets.ConnectionClosed:
+                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
+
+                except TimeoutError as e:
+                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
+
             
             return current_price_info
 
