@@ -81,7 +81,7 @@ class Coin:
 
     # 코인의 평균매수가
     def setBuyPrice(self, buy_price):
-        self.buy_price = buy_price
+        self.buy_price = float(buy_price)
 
     def setTodayOpeningprice(self, opening_price):
         self.opening_price = opening_price
@@ -93,4 +93,4 @@ class Coin:
         self.jump_num += 1
 
     def SetHighPrice(self, high_price):
-        self.high_price = high_price
+        self.high_price = float(high_price)
