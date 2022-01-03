@@ -531,11 +531,16 @@ class UpbitUtil:
                     self.coins_info[data['code']]['trade_price'] = data['trade_price']
                     # self.coins_info[data['code']]['opening_price'] = data['opening_price']
 
-                except websockets.ConnectionClosed:
-                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
+                except Exception as e:
+                    print(e, flush=True)
+                    logging.error(e)
+                    SendSlackMessage(ERROR_MESSAGE + "현재가 조회를 위한 웹 소켓의 오류가 발생하였습니다.")
 
-                except TimeoutError as e:
-                    logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
+                # except websockets.ConnectionClosed:
+                #     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
+
+                # except exceptions.TimeoutError as e:
+                #     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
     
     # 캔들 정보 얻어오기
     def GetCoinCandles(self, market_name, count=200, days=True, mins=60):
