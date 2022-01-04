@@ -217,9 +217,6 @@ while True:
                     # 코인 구입 [지정가 매도]
                     # upbitUtil.orderCoin(MYCOIN.market_name, SELL, orderable_volume, upbitUtil.coins_info[CoinName]['trade_price'], headers)
                     
-                    # 오늘 판매한 코인 목록에 추가, 판매한 당일은 더이상 매수 / 매도를 하지 않음
-                    CoinAccount.AddTodaySellList(MYCOIN.market_name)
-
                     # 로그 설정
                     logging.info("[+] {} 코인 {} 가격에 매도\n\t대략 {:.2f}% 변화".format(
                         MYCOIN.market_name,
