@@ -237,7 +237,7 @@ while True:
 
                 # 매수 조건에 만족할 때
                 if upbitUtil.coins_info[CoinName]['trade_price'] > Current_MA60 * (1 + (INPUT_COIN_BUYRANGE/100)) and \
-                upbitUtil.coins_info[CoinName]['trade_price'] < Current_MA60 * (1 + (1/100)) and \
+                upbitUtil.coins_info[CoinName]['trade_price'] < Current_MA60 * (1 + (2/100)) and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < Current_MA60 and \
                 current_krw > 5000:
                 # upbitUtil.coins_info[CoinName]['trade_price'] > Current_MA60 and \
