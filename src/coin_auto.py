@@ -166,7 +166,7 @@ while True:
             # 코인 정보 얻어오기
             MYCOIN = CoinAccount.GetCoin(CoinName)
                         
-            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\tMA5 : {}\n\tMA60 : {}\n\BEFORE_MA5 : {}\n\BEFORE_MA60 : {}\n\t최고가 : {}\n\t현재 캔들 시가 : {}"
+            logging.info("[-] {} 코인\n\t현재 가격 : {}\n\t매수 평균 : {}\n\tMA5 : {}\n\tMA60 : {}\n\tBEFORE_MA5 : {}\n\tBEFORE_MA60 : {}\n\t최고가 : {}\n\t현재 캔들 시가 : {}"
             .format(
                 MYCOIN.market_name, 
                 upbitUtil.coins_info[CoinName]['trade_price'],
@@ -277,20 +277,17 @@ while True:
 
                         # 보유 코인 목록 추가
                         CoinAccount.AddCoin(MYCOIN)
+                        
+                        time.sleep(0.1)
 
                         # 구입 가격 설정
-                        MYCOIN.setBuyPrice(upbitUtil.coins_info[CoinName]['trade_price'])
+                        MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
                         # 최고 가격 초기 설정
                         MYCOIN.SetHighPrice(MYCOIN.buy_price)
 
                         # 로그 설정
                         logging.info("[+] {} 코인 매수 완료".format(
-                            MYCOIN.market_name
-                        ))
-
-                        # SLACK 설정
-                        SendSlackMessage(INFO_MESSAGE + "[+] {} 코인 매수 완료".format(
                             MYCOIN.market_name
                         ))
 
