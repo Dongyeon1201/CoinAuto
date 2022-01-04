@@ -54,11 +54,14 @@ upbitUtil.setCoinInfo(frame)
 #################### 일봉 스케줄 모음 ####################
 
 # 오늘 판매한 코인 목록 초기화
-def daliyExec():
-    CoinAccount.ResetTodaySellList()
+# def daliyExec():
+#     CoinAccount.ResetTodaySellList()
 
 # 코인 정보 설정
 def InfoExec():
+
+    CoinAccount.ResetTodaySellList()
+
     for CoinName in CoinAccount.watch_coin_list:
 
         # 정보 얻어오기
@@ -83,12 +86,12 @@ def InfoExec():
 # schedule.every().hour.at(":00").do(everyhourExec)
 
 # 4시간마다 코인의 정보 재 설정
-schedule.every().day.at("09:00:03").do(InfoExec)
-schedule.every().day.at("13:00:03").do(InfoExec)
-schedule.every().day.at("17:00:03").do(InfoExec)
-schedule.every().day.at("21:00:03").do(InfoExec)
-schedule.every().day.at("01:00:03").do(InfoExec)
-schedule.every().day.at("05:00:03").do(InfoExec)
+schedule.every().day.at("09:00:00").do(InfoExec)
+schedule.every().day.at("13:00:00").do(InfoExec)
+schedule.every().day.at("17:00:00").do(InfoExec)
+schedule.every().day.at("21:00:00").do(InfoExec)
+schedule.every().day.at("01:00:00").do(InfoExec)
+schedule.every().day.at("05:00:00").do(InfoExec)
 
 # 최초 시작 시 MA와 가격 설정 함수 동작
 InfoExec()
@@ -145,8 +148,8 @@ while True:
             continue
 
         # 오늘 이미 판매한 코인들은 당일엔 더 이상 매수 / 매도를 하지 않음
-        # if CoinName in CoinAccount.today_sell_coin_list:
-        #     continue
+        if CoinName in CoinAccount.today_sell_coin_list:
+            continue
 
         # 코인 보유 시(매도 조건 확인)
         if CoinName in hold_coins:
