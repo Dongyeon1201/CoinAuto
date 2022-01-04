@@ -145,6 +145,10 @@ while True:
     # 모든 코인 조회
     for CoinName in CoinAccount.watch_coin_list:
 
+        # 이미 관심 코인에 등록된 코인은 더 이상 확인하지 않는다.
+        if CoinName in CoinAccount.favorite_coin_list:
+            continue
+
         # 사전에 trade_able값을 False으로 처리된 코인은 거래하지 않음
         if upbitUtil.coins_info[CoinName]['trade_able'] == False:
             continue
