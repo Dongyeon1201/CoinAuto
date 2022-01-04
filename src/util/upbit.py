@@ -449,22 +449,9 @@ class UpbitUtil:
     def setBeforeMA(self, res, market_name, count):
 
         MA = 0
-
-        # param = {
-        #     "count": count+1,
-        #     "market" : market_name
-        # }
-
-        # # 이동 평균선(일 단위)
-        # if days:
-        #     res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
         
-        # # 이동 평균선(분 단위)
-        # else:
-        #     res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(mins), headers=self.getHeaders(), params=param)
-        
-        # 요청한 count보다 적은 코인은 MA를 None으로 처리, 거래를 하지 않음
-        if len(res.json()) < count:
+        # 요청한 count+1보다 적은 코인은 MA를 None으로 처리, 거래를 하지 않음
+        if len(res.json()) < count+1:
             self.coins_info[market_name]['trade_able'] = False
             return
 
@@ -473,7 +460,7 @@ class UpbitUtil:
         for item in array:
             MA += item['trade_price']
 
-        self.coins_info[market_name]['Before_MA{}'.format(count)] = MA / count
+        self.coins_info[market_name]['BEFORE_MA{}'.format(count)] = MA / count
         self.coins_info[market_name]['trade_able'] = True
 
     # MarketName을 사용하여 해당 코인의 당일 시가 반환

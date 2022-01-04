@@ -10,7 +10,7 @@ class Account:
         self.hold_coin_list = []
         self.num_hold_coins = 0
 
-        self.today_sell_coin_list = []
+        self.favorite_coin_list = []
 
     def AddCoin(self, coin):
         self.hold_coin_list.append(coin)
@@ -35,8 +35,13 @@ class Account:
     def GetHoldCoinList(self):
         return [item.market_name for item in self.hold_coin_list]
 
-    def AddTodaySellList(self, market_name):
-        self.today_sell_coin_list.append(market_name)
+    def AddFavoriteList(self, market_name):
+        self.favorite_coin_list.append(market_name)
+
+    def DeleteFavoriteList(self, market_name):
+        for i, item in enumerate(self.favorite_coin_list):
+            if item == market_name:
+                self.hold_coin_list.pop(i)
         
-    def ResetTodaySellList(self):
-        self.today_sell_coin_list = []
+    def ResetFavoriteList(self):
+        self.favorite_coin_list = []
