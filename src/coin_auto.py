@@ -54,6 +54,8 @@ upbitUtil.setCoinInfo(frame)
 # 코인 정보 설정
 def InfoExec():
 
+    CoinAccount.ResetNotTradeCoinList()
+
     for CoinName in CoinAccount.watch_coin_list:
 
         # 정보 얻어오기
@@ -145,8 +147,8 @@ while True:
     # 모든 코인 조회
     for CoinName in CoinAccount.watch_coin_list:
 
-        # 이미 관심 코인에 등록된 코인은 더 이상 확인하지 않는다.
-        if CoinName in CoinAccount.favorite_coin_list:
+        # 이미 관심 코인에 등록된 코인은 다음 캔들까지 더 이상 확인하지 않는다.
+        if CoinName in CoinAccount.not_trade_coin_list:
             continue
 
         # 사전에 trade_able값을 False으로 처리된 코인은 거래하지 않음
@@ -309,7 +311,11 @@ while True:
                         Current_MA5 > Current_MA60 and \
                         CoinName not in CoinAccount.favorite_coin_list:
 
+                        # 관심 코인 목록에 등록
                         CoinAccount.AddFavoriteList(CoinName)
+
+                        # 관심 목록 코인에 등록된 코인은 다음 캔들까지 거래하지 않는다.
+                        CoinAccount.AddNotTradeCoinList(CoinName)
 
     ########## 1회 작업이 끝난 후 ##########
 

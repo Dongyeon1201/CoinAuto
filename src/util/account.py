@@ -11,6 +11,7 @@ class Account:
         self.num_hold_coins = 0
 
         self.favorite_coin_list = []
+        self.not_trade_coin_list = []
 
     def AddCoin(self, coin):
         self.hold_coin_list.append(coin)
@@ -45,3 +46,9 @@ class Account:
         
     def ResetFavoriteList(self):
         self.favorite_coin_list = []
+    
+    def AddNotTradeCoinList(self, market_name):
+        self.not_trade_coin_list.append(market_name)
+
+    def ResetNotTradeCoinList(self):
+        self.not_trade_coin_list = []
