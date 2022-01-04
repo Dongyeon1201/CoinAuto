@@ -81,6 +81,8 @@ def InfoExec():
         opening_price = res.json()[0]['opening_price']
         upbitUtil.setOpeningprice(opening_price=opening_price, market_name=CoinName)
 
+        sleep(0.1)
+
 ######################################################
 
 # 매일 9시에 각 MA 재 설정(15초 딜레이)
