@@ -425,19 +425,6 @@ class UpbitUtil:
 
         MA = 0
 
-        # param = {
-        #     "count": count,
-        #     "market" : market_name
-        # }
-
-        # # 이동 평균선(일 단위)
-        # if days:
-        #     res = requests.get(self.server_url + "/v1/candles/days", headers=self.getHeaders(), params=param)
-        
-        # # 이동 평균선(분 단위)
-        # else:
-        #     res = requests.get(self.server_url + "/v1/candles/minutes/{}".format(mins), headers=self.getHeaders(), params=param)
-        
         # 요청한 count보다 적은 코인은 MA를 None으로 처리, 거래를 하지 않음
         if len(res.json()) < count:
             self.coins_info[market_name]['trade_able'] = False
@@ -535,12 +522,6 @@ class UpbitUtil:
                     print(e, flush=True)
                     logging.error(e)
                     SendSlackMessage(ERROR_MESSAGE + "현재가 조회를 위한 웹 소켓의 오류가 발생하였습니다.")
-
-                # except websockets.ConnectionClosed:
-                #     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결이 종료되었습니다.")
-
-                # except exceptions.TimeoutError as e:
-                #     logging.error("[ Function Name : websocket_connect ]\n[+] 웹 소켓의 연결 가능 시간이 초과되었습니다.")
     
     # 캔들 정보 얻어오기
     def GetCoinCandles(self, market_name, count=200, days=True, mins=60):

@@ -172,7 +172,7 @@ while True:
             
             # 최고가 갱신 시 최고가 재 설정
             if upbitUtil.coins_info[CoinName]['trade_price'] > MYCOIN.high_price:
-
+                
                 MYCOIN.SetHighPrice(upbitUtil.coins_info[CoinName]['trade_price'])
 
                 # 로그 설정
@@ -240,7 +240,6 @@ while True:
                 upbitUtil.coins_info[CoinName]['trade_price'] < Current_MA60 * (1 + (2/100)) and \
                 upbitUtil.coins_info[CoinName]['opening_price'] < Current_MA60 and \
                 current_krw > 5000:
-                # upbitUtil.coins_info[CoinName]['trade_price'] > Current_MA60 and \
                     
                     # 매수 가능한 수량 확인 [지정가 매수에 사용]
                     # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
@@ -282,7 +281,6 @@ while True:
                     # 매수 가능한 현금 확인
                     current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
 
-        
     ########## 1회 작업이 끝난 후 ##########
 
     # 스케줄 확인
