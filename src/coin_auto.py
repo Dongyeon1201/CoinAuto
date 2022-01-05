@@ -253,7 +253,7 @@ while True:
 
                 # 관심 코인 목록에 존재하는 코인이, 현재의 MA5값도 MA60을 넘어섰을 때
                 if CoinName in CoinAccount.favorite_coin_list:
-                    
+
                     ## 매수 조건에 만족할 때
                     # 현재의 MA5가 현재의 MA60보다 높을 때
                     if Current_MA5 > Current_MA60 and current_krw > 5000:
@@ -286,9 +286,9 @@ while True:
 
                         # 매수 가능한 현금 확인
                         current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
-                        
-                        # 관심 코인 목록에서 삭제
-                        CoinAccount.DeleteFavoriteList(CoinName)
+
+                    # 관심 코인 목록에서 삭제
+                    CoinAccount.DeleteFavoriteList(CoinName)
 
                 # 관심 코인 목록에 존재하지 않는 코인일 때
                 else:
