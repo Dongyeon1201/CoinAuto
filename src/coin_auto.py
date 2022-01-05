@@ -278,10 +278,9 @@ while True:
                         # 보유 코인 목록 추가
                         CoinAccount.AddCoin(MYCOIN)
 
-                        print(CoinAccount.hold_coin_list, flush=[])
+                        print("BUY RESULT", flush=[])
+                        print(CoinAccount.GetHoldCoinList(), flush=[])
                         
-                        time.sleep(0.1)
-
                         # 구입 가격 설정
                         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 

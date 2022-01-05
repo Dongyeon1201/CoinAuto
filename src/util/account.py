@@ -42,7 +42,7 @@ class Account:
     def DeleteFavoriteList(self, market_name):
         for i, item in enumerate(self.favorite_coin_list):
             if item == market_name:
-                self.hold_coin_list.pop(i)
+                self.favorite_coin_list.pop(i)
         
     def ResetFavoriteList(self):
         self.favorite_coin_list = []
