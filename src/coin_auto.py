@@ -277,6 +277,8 @@ while True:
 
                         # 보유 코인 목록 추가
                         CoinAccount.AddCoin(MYCOIN)
+
+                        print(Account.GetHoldCoinList(), flush=[])
                         
                         time.sleep(0.1)
 
@@ -285,11 +287,6 @@ while True:
 
                         # 최고 가격 초기 설정
                         MYCOIN.SetHighPrice(MYCOIN.buy_price)
-
-                        # 로그 설정
-                        logging.info("[+] {} 코인 매수 완료".format(
-                            MYCOIN.market_name
-                        ))
 
                         # 매수 가능한 현금 확인
                         current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
