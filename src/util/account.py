@@ -10,7 +10,7 @@ class Account:
         self.hold_coin_list = []
         self.num_hold_coins = 0
 
-        self.favorite_coin_list = []
+        self.favorite_coin_list = ["KRW-CHZ"]
         self.not_trade_coin_list = []
 
     def AddCoin(self, coin):
