@@ -277,9 +277,6 @@ while True:
 
                         # 보유 코인 목록 추가
                         CoinAccount.AddCoin(MYCOIN)
-
-                        print("BUY RESULT", flush=[])
-                        print(CoinAccount.GetHoldCoinList(), flush=[])
                         
                         # 구입 가격 설정
                         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
@@ -290,12 +287,8 @@ while True:
                         # 매수 가능한 현금 확인
                         current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
                         
-                        print(CoinAccount.favorite_coin_list, flush=True)
-
                         # 관심 코인 목록에서 삭제
                         CoinAccount.DeleteFavoriteList(CoinName)
-
-                        print(CoinAccount.favorite_coin_list, flush=True)
 
                 # 관심 코인 목록에 존재하지 않는 코인일 때
                 else:
