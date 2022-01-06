@@ -16,20 +16,26 @@ def get_arguments():
     return_arg_data = {}
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--percent', required=False, default=100, help='이 코인이 전체 자산에서 차지하는 비율', dest='percent')
-    parser.add_argument('-d', '--highdown', required=False, default=10, help='최고가에서 얼마나 떨어지면 매도할지 퍼센트', dest='highdown')
-    parser.add_argument('-m', '--minprice', required=False, default=10, help='거래할 최소 금액', dest='minprice')
+    parser.add_argument('-p', '--percent', required=False, default=15, help='이 코인이 전체 자산에서 차지하는 비율', dest='percent')
+    parser.add_argument('-d', '--highdown', required=False, default=7, help='최고가에서 얼마나 떨어지면 매도할지 퍼센트', dest='highdown')
+    parser.add_argument('-e', '--exitdown', required=False, default=0.5, help='60일선에서 얼마나 떨어지면 매도할지 퍼센트', dest='exitdown')
+    parser.add_argument('-m', '--minprice', required=False, default=100, help='거래할 최소 시세', dest='minprice')
+    parser.add_argument('-b', '--buyrange', required=False, default=2.5, help='매수 시 가능 가격 범위', dest='buyrange')
    
     return_arg_data['percent'] = parser.parse_args().percent
     return_arg_data['highdown'] = parser.parse_args().highdown
+    return_arg_data['exitdown'] = parser.parse_args().exitdown
     return_arg_data['minprice'] = parser.parse_args().minprice
+    return_arg_data['buyrange'] = parser.parse_args().buyrange
 
     return return_arg_data
 
 # 코인이름 인자로 입력
 INPUT_COIN_PROPORTION = float(get_arguments()['percent'])
 INPUT_COIN_HIGH_DOWN = float(get_arguments()['highdown'])
+INPUT_COIN_EXIT_DOWN = float(get_arguments()['exitdown'])
 INPUT_COIN_MINPRICE = float(get_arguments()['minprice'])
+INPUT_COIN_BUY_RANGE = float(get_arguments()['buyrange'])
 
 upbitUtil = UpbitUtil(API_ACCESS_KEY, API_SECRET_KEY)
 CoinAccount = Account(upbitUtil.getAllCoinList())
@@ -193,13 +199,16 @@ while True:
 
             Current_MA5 = ((upbitUtil.coins_info[CoinName]['MA5'] * 4) + upbitUtil.coins_info[CoinName]['trade_price']) / 5                
             Current_MA60 = ((upbitUtil.coins_info[CoinName]['MA60'] * 59) + upbitUtil.coins_info[CoinName]['trade_price']) / 60 
-            Exit_Price = MYCOIN.high_price * float(1-(INPUT_COIN_HIGH_DOWN/100))
+            
+            High_Exit_Price = MYCOIN.high_price * float(1-(INPUT_COIN_HIGH_DOWN/100))
+            Exit_Price = Current_MA60 * float(1-(INPUT_COIN_EXIT_DOWN/100))
 
             ## 손절 조건 만족 시 매도
             # 현재의 MA5가 MA60보다 낮을 때
             # 최고가에서 10%이상 낮아졌을 때
             # 둘 중 하나의 조건이라도 만족하면 매도
             if  Current_MA5 < Current_MA60 or \
+                upbitUtil.coins_info[CoinName]['trade_price'] < High_Exit_Price or \
                 upbitUtil.coins_info[CoinName]['trade_price'] < Exit_Price:
                 
                 # 매도 가능한 수량 확인
@@ -256,7 +265,10 @@ while True:
 
                     ## 매수 조건에 만족할 때
                     # 현재의 MA5가 현재의 MA60보다 높을 때
-                    if Current_MA5 > Current_MA60 and current_krw > 5000:
+                    if Current_MA5 > Current_MA60 and \
+                        upbitUtil.coins_info[CoinName]['trade_price'] > Current_MA60 and \
+                        upbitUtil.coins_info[CoinName]['trade_price'] < Current_MA60 * float(1+(INPUT_COIN_BUY_RANGE / 100)) and \
+                        current_krw > 5000:
                         # 매수 가능한 수량 확인 [지정가 매수에 사용]
                         # orderable_volume = upbitUtil.getCanBuyVolume(CoinName, upbitUtil.coins_info[CoinName]['trade_price'], current_krw)
 
