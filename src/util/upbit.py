@@ -325,7 +325,7 @@ class UpbitUtil:
             if res.status_code == 201:
 
                 logging.info("{} 코인 매수 완료".format(market_name))
-                SendSlackMessage(INFO_MESSAGE + "{} 코인 매수 완료".format(market_name))
+                # SendSlackMessage(INFO_MESSAGE + "{} 코인 매수 완료".format(market_name))
 
             else:
                 logging.error("[ Function Name : orderCoin() ]\n[+] {} 항목의 매수를 성공하지 못하였습니다. STATUS CODE : {}".format(market_name, res.status_code))

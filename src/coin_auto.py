@@ -202,6 +202,7 @@ while True:
             
             High_Exit_Price = MYCOIN.high_price * float(1-(INPUT_COIN_HIGH_DOWN/100))
             Exit_Price = Current_MA60 * float(1-(INPUT_COIN_EXIT_DOWN/100))
+            Exit_Price2 = MYCOIN.buy_price * float(1-(1/100))
 
             ## 손절 조건 만족 시 매도
             # 현재의 MA5가 MA60보다 낮을 때
@@ -209,7 +210,8 @@ while True:
             # 둘 중 하나의 조건이라도 만족하면 매도
             if  Current_MA5 < Current_MA60 or \
                 upbitUtil.coins_info[CoinName]['trade_price'] < High_Exit_Price or \
-                upbitUtil.coins_info[CoinName]['trade_price'] < Exit_Price:
+                upbitUtil.coins_info[CoinName]['trade_price'] < Exit_Price or \
+                upbitUtil.coins_info[CoinName]['trade_price'] < Exit_Price2 :
                 
                 # 매도 가능한 수량 확인
                 orderable_volume = upbitUtil.getCanSellVolume(MYCOIN.market_name)
@@ -298,6 +300,8 @@ while True:
 
                         # 매수 가능한 현금 확인
                         current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
+
+                        SendSlackMessage(INFO_MESSAGE + "{} 코인 {} 가격에 매수 완료".format(CoinName, MYCOIN.buy_price))
 
                     # 관심 코인 목록에서 삭제
                     CoinAccount.DeleteFavoriteList(CoinName)
