@@ -295,6 +295,8 @@ while True:
                         # 구입 가격 설정
                         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
+                        time.sleep(0.1)
+
                         # 최고 가격 초기 설정
                         MYCOIN.SetHighPrice(MYCOIN.buy_price)
 
