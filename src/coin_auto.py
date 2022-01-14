@@ -295,15 +295,13 @@ while True:
                         # 구입 가격 설정
                         MYCOIN.setBuyPrice(upbitUtil.getBuyprice(CoinName))
 
-                        time.sleep(0.1)
-
                         # 최고 가격 초기 설정
                         MYCOIN.SetHighPrice(MYCOIN.buy_price)
 
                         # 매수 가능한 현금 확인
                         current_krw = upbitUtil.getCurrentKRW(INPUT_COIN_PROPORTION)
 
-                        SendSlackMessage(INFO_MESSAGE + "{} 코인 {} 가격에 매수 완료".format(CoinName, MYCOIN.buy_price))
+                        SendSlackMessage(INFO_MESSAGE + "{} 코인 매수 완료".format(CoinName))
 
                     # 관심 코인 목록에서 삭제
                     CoinAccount.DeleteFavoriteList(CoinName)
