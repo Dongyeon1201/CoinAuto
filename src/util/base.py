@@ -32,14 +32,14 @@ logging.basicConfig(
 
 API_SERVER_URL = "https://api.upbit.com"
 WEBSOCKET_URL = "wss://api.upbit.com/websocket/v1"
-API_ACCESS_KEY = "gdD6NqXZ4jI6AR5bDMn3b0w5yoTdex6vTdY8zyzi"
-API_SECRET_KEY = "1DI4qxHDm1sjdC7G6D4zRI32GGTvvs0LCnvUseUd"
+API_ACCESS_KEY = ""
+API_SECRET_KEY = ""
 
 BUY = "bid"
 SELL = "ask"
 BID_FEE_KRW = float(0.05/100)
 
-SLACK_TOKEN = "xoxb-2451513405360-2547455344711-oI4UayIywovAqCkMX8YK9Kvp"
+SLACK_TOKEN = ""
 SLACK_CHANNEL = "#upbit-알림봇"
 ERROR_MESSAGE = "*[+] MESSAGE TYPE : `ERROR`*\n"
 INFO_MESSAGE = "*[+] MESSAGE TYPE : `INFO`*\n"
